@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { canonicalizeRrule, expandEvent, splitRrule } from './recurrence.js'
+import { canonicalizeRrule, expandEvent, findOccurrenceStart, splitRrule } from './recurrence.js'
 
 const baseEvent = {
   id: 'event-id',
@@ -40,6 +40,7 @@ test('respeta el fin hasta una fecha', () => {
   )
 
   assert.equal(occurrences.length, 4)
+  assert.equal(canonicalizeRrule(rrule, baseEvent.startAt), rrule)
 })
 
 test('admite repeticiones sin fin con intervalos mensuales y anuales', () => {
@@ -71,4 +72,53 @@ test('al cortar una serie conserva intervalo, días y repeticiones restantes', (
   assert.match(split.nextRrule, /INTERVAL=2/)
   assert.match(split.nextRrule, /BYDAY=MO,WE/)
   assert.match(split.nextRrule, /COUNT=2/)
+})
+
+test('evalúa BYDAY y occurrenceDate en la fecha local de Buenos Aires', () => {
+  const mondayAtTen = {
+    ...baseEvent,
+    startAt: '2026-01-06T01:00:00.000Z',
+    endAt: '2026-01-06T02:00:00.000Z',
+  }
+  const rrule = canonicalizeRrule('FREQ=WEEKLY;BYDAY=MO;COUNT=2', mondayAtTen.startAt)
+  const occurrences = expandEvent(
+    { ...mondayAtTen, rrule },
+    '2026-01-05T00:00:00.000Z',
+    '2026-01-20T00:00:00.000Z',
+  )
+
+  assert.deepEqual(
+    occurrences.map(({ startAt, occurrenceDate }) => [startAt, occurrenceDate]),
+    [
+      ['2026-01-06T01:00:00.000Z', '2026-01-05'],
+      ['2026-01-13T01:00:00.000Z', '2026-01-12'],
+    ],
+  )
+  assert.equal(
+    findOccurrenceStart({ ...mondayAtTen, rrule }, '2026-01-12')?.toISOString(),
+    '2026-01-13T01:00:00.000Z',
+  )
+})
+
+test('mantiene la fecha local de los eventos de día completo', () => {
+  const allDayEvent = {
+    ...baseEvent,
+    allDay: true,
+    startAt: '2026-01-05T03:00:00.000Z',
+    endAt: '2026-01-06T03:00:00.000Z',
+  }
+  const rrule = canonicalizeRrule('FREQ=DAILY;COUNT=2', allDayEvent.startAt)
+  const occurrences = expandEvent(
+    { ...allDayEvent, rrule },
+    '2026-01-05T00:00:00.000Z',
+    '2026-01-08T00:00:00.000Z',
+  )
+
+  assert.deepEqual(
+    occurrences.map(({ startAt, occurrenceDate }) => [startAt, occurrenceDate]),
+    [
+      ['2026-01-05T03:00:00.000Z', '2026-01-05'],
+      ['2026-01-06T03:00:00.000Z', '2026-01-06'],
+    ],
+  )
 })
