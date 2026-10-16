@@ -132,7 +132,7 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 
 ### Teléfonos (la más simple, buena para probar el flujo)
 - [x] Codex: api + actions de phones
-- [ ] Claude: tabla con búsqueda en todos los campos, alta/edición inline o en modal, borrado con confirmación, estado vacío
+- [x] Claude: tabla con búsqueda en todos los campos, alta/edición inline o en modal, borrado con confirmación, estado vacío (branch `feat/phones-ui`)
 
 ### Pendientes
 - [x] Codex: api + actions de todos y categorías
@@ -190,3 +190,4 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - 2026-10-16 (Claude): animaciones con CSS + `<ViewTransition>` de React 19.3 (sin librería de animación). Modales y menús sobre `<dialog>` y Popover API nativos.
 - 2026-10-16 (Codex): recurrencias de Calendario admiten `INTERVAL`, `BYDAY`, fin por `UNTIL`, fin por `COUNT` o sin fin. Se evalúan como fechas flotantes de `America/Argentina/Buenos_Aires` y se convierten a instantes ISO al responder; `occurrenceDate` usa la fecha local `YYYY-MM-DD`, independientemente de la zona horaria del servidor.
 - 2026-10-16 (Codex): las excepciones de una serie usan la columna interna `events.recurrence_id` para conservar la fecha original aunque se mueva la ocurrencia. La migración `20261016145525_add_event_recurrence_id.sql` fue revisada y aplicada a Supabase.
+- 2026-10-16 (Claude): patrón de datos en el front: la página compone un `*Loader` (Server Component que llama a `api.js`) dentro de `<Suspense>` con skeleton, y le pasa los datos a un Client Component que mantiene la lista con `useCollection` y llama a las Server Actions con `useMutation` (toast de error y resultado `{ ok }`). Búsqueda sin tildes con `lib/utils/search.js`.
