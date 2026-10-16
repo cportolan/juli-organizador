@@ -12,7 +12,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Organizador personal para Juli: agenda, teléfonos internos, pendientes y fichas de personas con notas y adjuntos. Toda la interfaz está en **español rioplatense** ("vos", "guardá", "elegí").
 
-> `CLAUDE.md` y `AGENTS.md` tienen el mismo contenido. Si cambiás uno, cambiá el otro.
+> `CLAUDE.md` solo importa este archivo (`@AGENTS.md`). Las instrucciones se editan únicamente acá.
+
+## Trabajo entre agentes
+
+Este proyecto lo trabajan dos agentes en paralelo: **Codex** (backend, infraestructura, migraciones, todo lo server side) y **Claude** (todo el frontend y el diseño UX/UI). **Antes de empezar leé `TASKS.md`**: ahí están el reparto de archivos, el contrato de la API entre front y back, las tareas por fase y el registro de decisiones. No edites archivos que pertenecen al otro agente; dejá el pedido en `TASKS.md`.
 
 ---
 
