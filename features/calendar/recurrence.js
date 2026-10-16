@@ -3,6 +3,17 @@ import rrule from 'rrule'
 const { RRule } = rrule
 
 const ALLOWED_FREQUENCIES = new Set([RRule.DAILY, RRule.WEEKLY, RRule.MONTHLY, RRule.YEARLY])
+const CALENDAR_TIME_ZONE = 'America/Argentina/Buenos_Aires'
+const zonedDateTime = new Intl.DateTimeFormat('en-CA', {
+  timeZone: CALENDAR_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hourCycle: 'h23',
+})
 
 export function canonicalizeRrule(value, startAt) {
   if (value === null || value === undefined || value === '') return null
@@ -37,7 +48,8 @@ export function expandEvent(event, from, to) {
   const excluded = new Set(event.exdates)
   const searchFrom = new Date(fromDate.getTime() - duration)
 
-  return rule.between(searchFrom, toDate, true)
+  return rule.between(toFloatingDate(searchFrom), toFloatingDate(toDate), true)
+    .map(fromFloatingDate)
     .filter((start) => !excluded.has(dateKey(start)))
     .map((start) => {
       const end = new Date(start.getTime() + duration)
@@ -55,23 +67,26 @@ export function findOccurrenceStart(event, occurrenceDate) {
   const rule = buildRule(event.rrule, event.startAt)
   const dayStart = new Date(`${occurrenceDate}T00:00:00.000Z`)
   const dayEnd = new Date(`${occurrenceDate}T23:59:59.999Z`)
-  return rule.between(dayStart, dayEnd, true).find((date) => dateKey(date) === occurrenceDate) ?? null
+  const occurrence = rule.between(dayStart, dayEnd, true)[0]
+  return occurrence ? fromFloatingDate(occurrence) : null
 }
 
 export function splitRrule(event, occurrenceStart, nextStart) {
   const rule = buildRule(event.rrule, event.startAt)
-  const original = { ...rule.origOptions, dtstart: new Date(event.startAt) }
-  const beforeBoundary = new Date(occurrenceStart.getTime() - 1)
-  const previousCount = rule.between(new Date(event.startAt), beforeBoundary, true).length
+  const original = { ...rule.origOptions, dtstart: toFloatingDate(event.startAt) }
+  const floatingOccurrenceStart = toFloatingDate(occurrenceStart)
+  const beforeBoundary = new Date(floatingOccurrenceStart.getTime() - 1)
+  const previousCount = rule.between(original.dtstart, beforeBoundary, true).length
   const originalCount = original.count ?? null
   const remainingCount = originalCount === null ? null : originalCount - previousCount
 
   const beforeRrule = previousCount === 0
     ? null
-    : serializeRule({ ...original, count: previousCount, until: null })
+    : serializeRule({ ...original, dtstart: new Date(event.startAt), count: previousCount, until: null })
   const nextOptions = {
     ...original,
     dtstart: nextStart,
+    until: original.until ? fromFloatingDate(original.until) : undefined,
     count: remainingCount,
   }
 
@@ -83,11 +98,17 @@ export function splitRrule(event, occurrenceStart, nextStart) {
 }
 
 export function dateKey(value) {
-  return new Date(value).toISOString().slice(0, 10)
+  const parts = zonedParts(value)
+  return `${parts.year}-${pad(parts.month)}-${pad(parts.day)}`
 }
 
 function buildRule(value, startAt) {
-  return new RRule({ ...parseOptions(value), dtstart: new Date(startAt) })
+  const options = parseOptions(value)
+  return new RRule({
+    ...options,
+    dtstart: toFloatingDate(startAt),
+    until: options.until ? toFloatingDate(options.until) : undefined,
+  })
 }
 
 function parseOptions(value) {
@@ -105,4 +126,61 @@ function serializeRule(options) {
 
 function overlaps(startAt, endAt, from, to) {
   return new Date(startAt) < to && new Date(endAt) > from
+}
+
+function toFloatingDate(value) {
+  const parts = zonedParts(value)
+  return new Date(Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second,
+    new Date(value).getUTCMilliseconds(),
+  ))
+}
+
+function fromFloatingDate(value) {
+  const floating = new Date(value)
+  const expected = Date.UTC(
+    floating.getUTCFullYear(),
+    floating.getUTCMonth(),
+    floating.getUTCDate(),
+    floating.getUTCHours(),
+    floating.getUTCMinutes(),
+    floating.getUTCSeconds(),
+    floating.getUTCMilliseconds(),
+  )
+  let instant = expected
+
+  // Two passes also handle zones whose offset changes around the target date.
+  for (let pass = 0; pass < 2; pass += 1) {
+    const actual = zonedParts(instant)
+    const represented = Date.UTC(
+      actual.year,
+      actual.month - 1,
+      actual.day,
+      actual.hour,
+      actual.minute,
+      actual.second,
+      floating.getUTCMilliseconds(),
+    )
+    instant += expected - represented
+  }
+
+  return new Date(instant)
+}
+
+function zonedParts(value) {
+  return Object.fromEntries(
+    zonedDateTime
+      .formatToParts(new Date(value))
+      .filter(({ type }) => type !== 'literal')
+      .map(({ type, value: part }) => [type, Number(part)]),
+  )
+}
+
+function pad(value) {
+  return String(value).padStart(2, '0')
 }
