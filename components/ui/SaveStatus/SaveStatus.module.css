@@ -1,0 +1,40 @@
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 20px;
+  font-size: var(--text-xs);
+  color: var(--text-subtle);
+  white-space: nowrap;
+  animation: fade-in var(--dur) var(--ease-out);
+}
+
+.icon {
+  width: 13px;
+  height: 13px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tone-butter);
+}
+
+[data-status="saving"] .icon {
+  animation: spin 0.9s linear infinite;
+}
+
+[data-status="saved"] .icon {
+  color: var(--success);
+}
+
+[data-status="error"] {
+  color: var(--danger-strong);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

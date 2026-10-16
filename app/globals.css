@@ -38,6 +38,22 @@
   --tone-mint: #a6dbd2;
   --tone-sand: #dcc9ad;
 
+  /* Colores del editor de texto: tinta (texto) y resaltador.
+     Se guardan en el contenido como var(--ink-*) / var(--mark-*), así se
+     adaptan solos al modo oscuro con buen contraste. */
+  --ink-rose: #b5466b;
+  --ink-peach: #b2582f;
+  --ink-butter: #8a6a12;
+  --ink-sage: #3f7a4c;
+  --ink-sky: #2f6aa3;
+  --ink-lilac: #6a52a8;
+  --mark-rose: #f7d3de;
+  --mark-peach: #fadccd;
+  --mark-butter: #f6e7b4;
+  --mark-sage: #d3e7d6;
+  --mark-sky: #d3e3f4;
+  --mark-lilac: #e2dbf0;
+
   --danger: #d9776f;
   --danger-soft: color-mix(in oklab, var(--danger) 16%, var(--surface));
   --danger-strong: color-mix(in oklab, var(--danger) 70%, var(--text));
@@ -118,6 +134,19 @@
 
   --danger-soft: color-mix(in oklab, var(--danger) 20%, var(--surface));
   --danger-strong: color-mix(in oklab, var(--danger) 75%, var(--text));
+
+  --ink-rose: #f2a3bd;
+  --ink-peach: #f5b796;
+  --ink-butter: #ecd28c;
+  --ink-sage: #a6d4b0;
+  --ink-sky: #a5c8ee;
+  --ink-lilac: #c9bdf0;
+  --mark-rose: #5a3442;
+  --mark-peach: #5a3d30;
+  --mark-butter: #544a2b;
+  --mark-sage: #33493a;
+  --mark-sky: #2f4258;
+  --mark-lilac: #433b59;
 
   --shadow-color: 0 0 0;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);

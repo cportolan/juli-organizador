@@ -3,11 +3,10 @@
 import { useId, useRef } from "react";
 import { MoreHorizontal } from "lucide-react";
 import { cx } from "@/lib/utils/cx";
+import { positionPopover } from "@/lib/utils/popover";
 import IconButton from "@/components/ui/IconButton/IconButton";
 import Button from "@/components/ui/Button/Button";
 import styles from "./DropdownMenu.module.css";
-
-const GAP = 6;
 
 /**
  * Menú desplegable sobre la Popover API (cierra con click afuera y Escape).
@@ -27,25 +26,9 @@ export default function DropdownMenu({
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
 
-  function position() {
-    const trigger = triggerRef.current?.getBoundingClientRect();
-    const menu = menuRef.current;
-    if (!trigger || !menu) return;
-
-    const width = menu.offsetWidth;
-    const height = menu.offsetHeight;
-    let left = align === "end" ? trigger.right - width : trigger.left;
-    left = Math.min(Math.max(8, left), window.innerWidth - width - 8);
-    const below = trigger.bottom + GAP;
-    const top = below + height > window.innerHeight - 8 ? trigger.top - height - GAP : below;
-
-    menu.style.left = `${left}px`;
-    menu.style.top = `${top}px`;
-  }
-
   function handleToggle(event) {
     if (event.newState !== "open") return;
-    position();
+    positionPopover(triggerRef.current, menuRef.current, align);
     menuRef.current?.querySelector('[role="menuitem"]')?.focus();
   }
 
