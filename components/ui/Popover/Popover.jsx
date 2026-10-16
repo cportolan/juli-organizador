@@ -15,9 +15,8 @@ export default function Popover({ trigger, label, align = "start", onOpen, class
   const triggerRef = useRef(null);
   const panelRef = useRef(null);
 
-  function close() {
-    panelRef.current?.hidePopover();
-  }
+  // Sin ref: `close` se pasa a los hijos durante el render.
+  const close = () => document.getElementById(id)?.hidePopover();
 
   function handleToggle(event) {
     if (event.newState !== "open") return;
