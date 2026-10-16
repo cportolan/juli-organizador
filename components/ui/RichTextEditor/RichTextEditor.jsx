@@ -33,7 +33,8 @@ export default function RichTextEditor({
 
   const editor = useEditor({
     extensions,
-    content: content ?? null,
+    // Una ficha nueva puede venir como {}: Tiptap solo acepta un doc válido o null.
+    content: content?.type === "doc" ? content : null,
     editable,
     immediatelyRender: false,
     editorProps: {

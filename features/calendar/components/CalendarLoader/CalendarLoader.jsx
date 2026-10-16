@@ -1,9 +1,11 @@
+import { connection } from "next/server";
 import { getEvents } from "@/features/calendar/api";
 import { toDateKey } from "@/lib/utils/dates";
 import { getCalendarRange, parseCalendarParams } from "@/lib/utils/calendar";
 import CalendarView from "../CalendarView/CalendarView";
 
 export default async function CalendarLoader({ searchParams }) {
+  await connection();
   const params = await searchParams;
   const today = toDateKey(new Date());
   const state = parseCalendarParams(params, today);
