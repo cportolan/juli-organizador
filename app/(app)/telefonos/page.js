@@ -1,17 +1,16 @@
-import { Phone } from "lucide-react";
+import { Suspense } from "react";
 import Page from "@/components/layout/Page/Page";
-import EmptyState from "@/components/ui/EmptyState/EmptyState";
+import PhoneBookLoader from "@/features/phones/components/PhoneBookLoader/PhoneBookLoader";
+import PhoneBookSkeleton from "@/features/phones/components/PhoneBookSkeleton/PhoneBookSkeleton";
 
 export const metadata = { title: "Teléfonos" };
 
 export default function PhonesPage() {
   return (
     <Page title="Teléfonos" description="Oficinas, agentes e internos.">
-      <EmptyState
-        icon={Phone}
-        title="La agenda de internos está en camino"
-        description="Una tabla con búsqueda en todos los campos."
-      />
+      <Suspense fallback={<PhoneBookSkeleton />}>
+        <PhoneBookLoader />
+      </Suspense>
     </Page>
   );
 }

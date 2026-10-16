@@ -1,0 +1,151 @@
+.wrapper {
+  border-top: 1px solid var(--border-strong);
+  animation: rise-in var(--dur-slow) var(--ease-out);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--text-subtle);
+  border-bottom: 1px solid var(--border);
+}
+
+.table td {
+  padding: var(--space-3) var(--space-4);
+  vertical-align: middle;
+}
+
+.row {
+  border-top: 1px solid var(--border);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+/* Dentro de un grupo de la misma oficina la línea se suaviza */
+.repeated {
+  border-top-color: transparent;
+  background-image: linear-gradient(var(--border), var(--border));
+  background-size: calc(100% - 30%) 1px;
+  background-position: right top;
+  background-repeat: no-repeat;
+}
+
+.row:hover {
+  background-color: var(--primary-softer);
+}
+
+.office {
+  width: 30%;
+  font-family: var(--font-heading);
+  font-size: var(--text-md);
+}
+
+.officeRepeated {
+  color: transparent;
+  user-select: none;
+}
+
+.agent {
+  width: 34%;
+}
+
+.phone {
+  width: 26%;
+}
+
+.actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.actions > * + * {
+  margin-left: 2px;
+}
+
+.missing {
+  color: var(--text-subtle);
+}
+
+@media (hover: hover) {
+  .actions {
+    opacity: 0;
+    transition: opacity var(--dur-fast) var(--ease-out);
+  }
+
+  .row:hover .actions,
+  .row:focus-within .actions {
+    opacity: 1;
+  }
+}
+
+/* Mobile: cada fila es un bloque */
+@media (max-width: 640px) {
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody {
+    display: block;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "office actions"
+      "agent actions"
+      "phone actions";
+    padding: var(--space-3) 0;
+  }
+
+  .repeated {
+    background-size: 100% 1px;
+  }
+
+  .table td {
+    padding: 0 var(--space-2);
+  }
+
+  .office,
+  .agent,
+  .phone {
+    width: auto;
+  }
+
+  .office {
+    grid-area: office;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .officeRepeated {
+    color: inherit;
+    user-select: auto;
+  }
+
+  .agent {
+    grid-area: agent;
+    font-weight: 500;
+  }
+
+  .phone {
+    grid-area: phone;
+    margin-top: var(--space-1);
+  }
+
+  .actions {
+    grid-area: actions;
+    align-self: center;
+    opacity: 1;
+  }
+}
