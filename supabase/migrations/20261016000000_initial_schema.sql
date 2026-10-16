@@ -27,9 +27,11 @@ create table public.events (
   rrule text,
   exdates date[] not null default '{}',
   series_id uuid references public.events(id) on delete cascade,
+  recurrence_id date,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  constraint events_end_after_start check (end_at >= start_at)
+  constraint events_end_after_start check (end_at >= start_at),
+  constraint events_exception_identity check ((series_id is null) = (recurrence_id is null))
 );
 
 create table public.day_notes (
@@ -101,6 +103,7 @@ create table public.person_attachments (
 );
 
 create index events_user_start_idx on public.events (user_id, start_at);
+create unique index events_exception_occurrence_idx on public.events (user_id, series_id, recurrence_id);
 create index day_notes_user_date_idx on public.day_notes (user_id, date);
 create index phones_user_idx on public.phones (user_id);
 create index todos_user_status_idx on public.todos (user_id, status);

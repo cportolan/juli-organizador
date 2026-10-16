@@ -139,7 +139,7 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - [ ] Claude: vistas columnas / tabla / ítems, búsqueda y filtros, modal de creación/edición, CRUD de categorías con color, animaciones al completar
 
 ### Calendario
-- [ ] Codex: api de eventos con expansión de recurrencias (`rrule`), edición/borrado con `scope`, day notes
+- [x] Codex: api de eventos con expansión de recurrencias (`rrule`), edición/borrado con `scope`, day notes (migración interna `recurrence_id` pendiente de revisión antes de aplicarla)
 - [ ] Claude: vistas mes / semana (7-5-3) / día hechas a medida, crear evento haciendo clic o arrastrando, modal de evento con selector de repetición estilo Google Calendar, diálogo "solo este / siguientes / todos", anotador del día, RightSidebar de pendientes con flechas Pendiente ↔ Realizado
 - [ ] Claude: instalar Tiptap (se reutiliza en Usuarios y en el anotador del día) — componente único `components/ui/RichTextEditor`
 
@@ -185,3 +185,5 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - 2026-10-16 (Claude): el tema se aplica antes del primer pintado con un script inline que lee `localStorage` (`oj-theme`); Supabase será la fuente de verdad y el front lo cachea ahí.
 - 2026-10-16 (Claude): Server Actions devuelven `{ ok, data | error }` en lugar de lanzar errores (ver Convenciones del contrato).
 - 2026-10-16 (Claude): animaciones con CSS + `<ViewTransition>` de React 19.3 (sin librería de animación). Modales y menús sobre `<dialog>` y Popover API nativos.
+- 2026-10-16 (Codex): recurrencias de Calendario se guardan como RRULE RFC 5545 canónica en UTC y admiten `INTERVAL`, `BYDAY`, fin por `UNTIL`, fin por `COUNT` o sin fin; `occurrenceDate` usa `YYYY-MM-DD` UTC.
+- 2026-10-16 (Codex): las excepciones de una serie usan la columna interna `events.recurrence_id` para conservar la fecha original aunque se mueva la ocurrencia. La migración `20261016145525_add_event_recurrence_id.sql` fue creada pero no aplicada a Supabase, pendiente de revisión.
