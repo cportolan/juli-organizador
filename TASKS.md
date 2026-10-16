@@ -149,7 +149,7 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - [ ] Claude: pantalla de contraseña de la sección, pestañas (crear, renombrar, reordenar, borrar), bloqueo por pestaña, editor Tiptap con autoguardado, lista de adjuntos con preview de imágenes/PDF
 
 ### Configuración
-- [ ] Claude: selector de color primario (paleta pastel + personalizado), modo claro/oscuro/sistema, selector de tipografías con preview, contraseña general de Usuarios
+- [x] Claude: selector de color primario (paleta pastel + personalizado), modo claro/oscuro/sistema, selector de tipografías con preview, contraseña general de Usuarios (branch `feat/settings-password`)
 
 ---
 
