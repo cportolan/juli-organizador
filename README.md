@@ -93,8 +93,7 @@ Flujo:
 
 - **Hecho:**
   - Sistema de diseño, layout, login y Configuración de tema (conectados a Supabase).
-  - Backend de Teléfonos, Pendientes y Calendario.
+  - Backend de Teléfonos, Pendientes y Calendario (con recurrencias en hora de Buenos Aires).
 - **Siguiente (Fase 2):**
   - Interfaz de Teléfonos, Pendientes y Calendario (Claude).
-  - Corrección de zona horaria en recurrencias (Codex).
   - Sección Usuarios (Codex y Claude).
