@@ -67,7 +67,7 @@ Las migraciones están en `supabase/migrations/` y se aplican en orden. Ver `sup
 | --- | --- |
 | `20261016000000_initial_schema.sql` | Aplicada |
 | `20261016144539_secure_updated_at_search_path.sql` | Aplicada |
-| `20261016145525_add_event_recurrence_id.sql` | **Pendiente**: aplicarla antes de usar el calendario |
+| `20261016145525_add_event_recurrence_id.sql` | Aplicada |
 
 Para aplicar una pendiente sin la CLI: Supabase → **SQL Editor** → pegar el archivo → **Run**.
 

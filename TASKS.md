@@ -139,7 +139,7 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - [ ] Claude: vistas columnas / tabla / ítems, búsqueda y filtros, modal de creación/edición, CRUD de categorías con color, animaciones al completar
 
 ### Calendario
-- [x] Codex: api de eventos con expansión de recurrencias (`rrule`), edición/borrado con `scope`, day notes (migración interna `recurrence_id` pendiente de revisión antes de aplicarla)
+- [x] Codex: api de eventos con expansión de recurrencias (`rrule`), edición/borrado con `scope`, day notes (migración `recurrence_id` revisada y aplicada)
 - [ ] Claude: vistas mes / semana (7-5-3) / día hechas a medida, crear evento haciendo clic o arrastrando, modal de evento con selector de repetición estilo Google Calendar, diálogo "solo este / siguientes / todos", anotador del día, RightSidebar de pendientes con flechas Pendiente ↔ Realizado
 - [ ] Claude: instalar Tiptap (se reutiliza en Usuarios y en el anotador del día) — componente único `components/ui/RichTextEditor`
 
