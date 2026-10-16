@@ -1,0 +1,79 @@
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  animation: rise-in var(--dur) var(--ease-out);
+}
+
+.thumb {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition: transform var(--dur) var(--ease-spring);
+}
+
+.thumb:hover {
+  transform: scale(1.04);
+}
+
+.thumb svg {
+  width: 20px;
+  height: 20px;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.title,
+.titleInput {
+  display: block;
+  width: 100%;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.title:hover {
+  color: var(--primary-strong);
+}
+
+.titleInput {
+  padding: 2px 6px;
+  margin-left: -6px;
+  border: 1px solid var(--primary-strong);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--text-xs);
+  color: var(--text-subtle);
+}
+
+.fileName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

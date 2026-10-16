@@ -1,0 +1,37 @@
+.unlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 400px;
+  margin: var(--space-12) auto;
+  text-align: center;
+  animation: rise-in var(--dur-slow) var(--ease-out);
+}
+
+.icon {
+  width: 28px;
+  height: 28px;
+  color: var(--primary-strong);
+}
+
+.text {
+  color: var(--text-muted);
+}
+
+.text strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.input {
+  flex: 1;
+  text-align: left;
+}

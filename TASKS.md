@@ -146,7 +146,8 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 ### Usuarios (fichas)
 - [ ] Codex: api + actions de people, contraseñas hasheadas, cookie de desbloqueo, upload/descarga de adjuntos con signed URLs
 - [ ] Codex: impedir que `people.content`, `people.password_hash` y `settings.people_password_hash` sean legibles por `authenticated` desde la Data API; el contenido bloqueado solo puede salir por funciones de servidor que verifiquen la contraseña
-- [ ] Claude: pantalla de contraseña de la sección, pestañas (crear, renombrar, reordenar, borrar), bloqueo por pestaña, editor Tiptap con autoguardado, lista de adjuntos con preview de imágenes/PDF
+- [x] Claude: pantalla de contraseña de la sección, pestañas (crear, renombrar, reordenar, borrar), bloqueo por pestaña, editor Tiptap con autoguardado, lista de adjuntos con preview de imágenes/PDF (branch `feat/people-ui`, **contra mocks**)
+- [ ] Claude: cuando estén las actions de people, cambiar el import de `features/people/hooks/peopleService.js` y el de `PeopleLoader` (hoy `mocksServer.js`) por `actions.js` / `api.js`, y borrar `mocks.js` y `mocksServer.js`
 
 ### Configuración
 - [x] Claude: selector de color primario (paleta pastel + personalizado), modo claro/oscuro/sistema, selector de tipografías con preview, contraseña general de Usuarios (branch `feat/settings-password`)
@@ -173,6 +174,12 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - [x] (De Claude para Codex) **Migraciones:** no editar migraciones que ya están aplicadas; cada cambio va en una migración nueva. En el merge saqué `recurrence_id` de `20261016000000_initial_schema.sql` porque `20261016145525_add_event_recurrence_id.sql` la agrega de nuevo y en una base vacía fallaría. — 2026-10-16
 - [ ] (De Claude para Codex) **Revisar:** toqué `features/calendar/recurrence.js` (archivo tuyo) porque rompía el build: `import rrule from 'rrule'` no existe en el ESM que usa el bundler de Next. Quedó `import * as rruleModule` tomando `RRule` del export con nombre o de `default` (Node). `recurrence.test.mjs` sigue pasando. Si preferís otra solución, cambialo. — 2026-10-16
 - [ ] (De Claude para Codex) Opcional: `getDayNotes({ from, to })` → `[{ date }]` (solo fechas con nota) para marcar en el calendario los días que tienen nota. — 2026-10-16
+- [ ] (De Claude para Codex) **Usuarios — ajustes al contrato** (la UI ya está hecha contra `features/people/mocks.js`, que tiene exactamente las firmas que uso):
+  - `getPerson({ id, password })` y `getAttachments(personId)` se llaman **desde el cliente** (al desbloquear una ficha o cambiar de pestaña), así que tienen que ser Server Actions en `actions.js` y devolver `{ ok, data }`. Errores esperados: `"Esta ficha tiene contraseña."` (sin password) y `"La contraseña de la ficha no es correcta."`.
+  - `unlockPeopleSection(password)` → `{ ok, data }` (después la UI hace `router.refresh()` y el servidor lee `isPeopleSectionUnlocked()`).
+  - `uploadAttachment(formData)` recibe `personId`, `title` y `file` en el `FormData`. El front limita a 10 MB; validar también tamaño y tipo en el servidor (y el límite de body de Server Actions en `next.config.js`, que por defecto es 1 MB — revisar `serverActions.bodySizeLimit`).
+  - `setPersonPassword` → `{ ok, data: { hasPassword } }`. `savePersonContent` → `{ ok, data }`. `reorderPeople(ids)` → `{ ok }`.
+  — 2026-10-16
 - [ ] (De Claude para Codex) `getEvents` trae todos los eventos y filtra en memoria. Por ahora sirve; más adelante filtrar en la consulta los eventos sin repetición que no tocan el rango. — 2026-10-16
 
 ---
@@ -196,3 +203,4 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - 2026-10-16 (Claude): fechas en el front con `lib/utils/dates.js` (date-fns + `@date-fns/tz`), siempre en `America/Argentina/Buenos_Aires` para que servidor y navegador coincidan. Los colores de categorías se eligen de `TONE_SWATCHES` (hex de los tonos pastel) o color libre.
 - 2026-10-16 (Claude): Tiptap 3.31.3 con versiones exactas (todas las `@tiptap/*` tienen que coincidir). Los colores de texto y resaltado se guardan en el JSON como `var(--ink-*)` / `var(--mark-*)`, así se adaptan al modo oscuro. Autoguardado con `lib/hooks/useAutosave.js` + `components/ui/SaveStatus`.
 - 2026-10-16 (Claude): Calendario: vista, días y fecha viven en la URL (`/calendario?vista=semana&dias=7&fecha=YYYY-MM-DD`); el servidor carga el rango y después de cada mutación se hace `router.refresh()`. Eventos de día completo: `startAt` = medianoche del primer día y `endAt` = medianoche del día siguiente al último (fin exclusivo), en hora de Argentina. Al editar "todos" desde una repetición, el front manda solo los campos cambiados y corre el DTSTART de la serie lo mismo que se movió la repetición.
+- 2026-10-16 (Claude): Usuarios: la pestaña elegida se recuerda en el navegador (`oj-people-active`). Las fichas con contraseña se vuelven a bloquear al cambiar de pestaña; la contraseña nunca se guarda en el cliente. Si la sección está bloqueada, el servidor no manda ni los nombres de las fichas.
