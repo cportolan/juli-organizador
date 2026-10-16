@@ -1,26 +1,26 @@
-import { CalendarDays, ListTodo } from "lucide-react";
+import { Suspense } from "react";
 import Page from "@/components/layout/Page/Page";
-import RightSidebar from "@/components/layout/RightSidebar/RightSidebar";
-import EmptyState from "@/components/ui/EmptyState/EmptyState";
+import CalendarLoader from "@/features/calendar/components/CalendarLoader/CalendarLoader";
+import CalendarAsideLoader from "@/features/calendar/components/CalendarAsideLoader/CalendarAsideLoader";
+import CalendarSkeleton, { CalendarAsideSkeleton } from "@/features/calendar/components/CalendarSkeleton/CalendarSkeleton";
 
 export const metadata = { title: "Calendario" };
 
-export default function CalendarPage() {
+export default function CalendarPage({ searchParams }) {
   return (
     <Page
       title="Calendario"
+      hideHeader
       wide
       aside={
-        <RightSidebar title="Pendientes" storageKey="oj-calendar-todos">
-          <EmptyState compact icon={ListTodo} title="Sin pendientes" description="Lo que anotes en Pendientes aparece acá." />
-        </RightSidebar>
+        <Suspense fallback={<CalendarAsideSkeleton />}>
+          <CalendarAsideLoader searchParams={searchParams} />
+        </Suspense>
       }
     >
-      <EmptyState
-        icon={CalendarDays}
-        title="El calendario está en camino"
-        description="Vistas de mes, semana y día, eventos que se repiten y el anotador de cada día."
-      />
+      <Suspense fallback={<CalendarSkeleton />}>
+        <CalendarLoader searchParams={searchParams} />
+      </Suspense>
     </Page>
   );
 }

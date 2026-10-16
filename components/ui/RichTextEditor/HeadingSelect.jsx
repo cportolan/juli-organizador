@@ -11,9 +11,7 @@ const OPTIONS = [
 ];
 
 /** Tipo de bloque: texto normal o títulos. */
-export default function HeadingSelect({ editor, value, compact }) {
-  const options = compact ? OPTIONS.filter((option) => option.value !== 1) : OPTIONS;
-
+export default function HeadingSelect({ editor, value }) {
   function handleChange(event) {
     const level = Number(event.target.value);
     const chain = editor.chain().focus();
@@ -23,7 +21,7 @@ export default function HeadingSelect({ editor, value, compact }) {
   return (
     <span className={styles.headingSelect}>
       <select value={value} onChange={handleChange} aria-label="Tipo de texto">
-        {options.map((option) => (
+        {OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>

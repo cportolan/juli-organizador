@@ -5,19 +5,25 @@ import styles from "./Page.module.css";
 /**
  * Contenedor de cada página: anima la entrada al navegar y ordena
  * encabezado + contenido. `aside` es el sidebar derecho opcional.
+ * Con `hideHeader` el título queda solo para lectores de pantalla (el
+ * calendario usa su propia barra como encabezado).
  */
-export default function Page({ title, description, actions, toolbar, aside, wide = false, children }) {
+export default function Page({ title, description, actions, toolbar, aside, wide = false, hideHeader = false, children }) {
   return (
     <div className={styles.layout}>
       <ViewTransition enter="page-enter" exit="page-exit" default="none">
         <div className={cx(styles.page, wide && styles.wide)}>
-          <header className={styles.header}>
-            <div className={styles.heading}>
-              <h1 className={styles.title}>{title}</h1>
-              {description && <p className={styles.description}>{description}</p>}
-            </div>
-            {actions && <div className={styles.actions}>{actions}</div>}
-          </header>
+          {hideHeader ? (
+            <h1 className="visually-hidden">{title}</h1>
+          ) : (
+            <header className={styles.header}>
+              <div className={styles.heading}>
+                <h1 className={styles.title}>{title}</h1>
+                {description && <p className={styles.description}>{description}</p>}
+              </div>
+              {actions && <div className={styles.actions}>{actions}</div>}
+            </header>
+          )}
           {toolbar && <div className={styles.toolbar}>{toolbar}</div>}
           <div className={styles.body}>{children}</div>
         </div>

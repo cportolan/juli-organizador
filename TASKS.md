@@ -140,7 +140,7 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 
 ### Calendario
 - [x] Codex: api de eventos con expansión de recurrencias (`rrule`), edición/borrado con `scope`, day notes (migración `recurrence_id` revisada y aplicada)
-- [ ] Claude: vistas mes / semana (7-5-3) / día hechas a medida, crear evento haciendo clic o arrastrando, modal de evento con selector de repetición estilo Google Calendar, diálogo "solo este / siguientes / todos", anotador del día, RightSidebar de pendientes con flechas Pendiente ↔ Realizado
+- [x] Claude: vistas mes / semana (7-5-3) / día hechas a medida, crear evento haciendo clic o arrastrando, modal de evento con selector de repetición estilo Google Calendar, diálogo "solo este / siguientes / todos", anotador del día, RightSidebar de pendientes con flechas Pendiente ↔ Realizado (branch `feat/calendar-ui`)
 - [x] Claude: instalar Tiptap (se reutiliza en Usuarios y en el anotador del día) — componente único `components/ui/RichTextEditor` (branch `feat/rich-text-editor`)
 
 ### Usuarios (fichas)
@@ -171,6 +171,8 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - [x] (De Claude para Codex) Settings: el front usa exactamente `primaryColor` (hex `#rrggbb`), `themeMode` (`light|dark|system`), `headingFont` (`lora|fraunces|playfair|dm-serif`), `bodyFont` (`roboto|inter|nunito|dm-sans`). Validar contra esos valores. — 2026-10-16
 - [x] (De Claude para Codex) **Zona horaria en recurrencias:** hoy se expanden en UTC y `occurrenceDate` es la fecha UTC. Un evento semanal "lunes 22:00" en Argentina (UTC-3) cae martes 01:00 UTC, así que `BYDAY` y `occurrenceDate` quedan corridos un día, y lo mismo con los eventos de todo el día. Expandir con la zona `America/Argentina/Buenos_Aires` (`tzid` de rrule o equivalente) y que `occurrenceDate` sea la fecha local. — 2026-10-16
 - [x] (De Claude para Codex) **Migraciones:** no editar migraciones que ya están aplicadas; cada cambio va en una migración nueva. En el merge saqué `recurrence_id` de `20261016000000_initial_schema.sql` porque `20261016145525_add_event_recurrence_id.sql` la agrega de nuevo y en una base vacía fallaría. — 2026-10-16
+- [ ] (De Claude para Codex) **Revisar:** toqué `features/calendar/recurrence.js` (archivo tuyo) porque rompía el build: `import rrule from 'rrule'` no existe en el ESM que usa el bundler de Next. Quedó `import * as rruleModule` tomando `RRule` del export con nombre o de `default` (Node). `recurrence.test.mjs` sigue pasando. Si preferís otra solución, cambialo. — 2026-10-16
+- [ ] (De Claude para Codex) Opcional: `getDayNotes({ from, to })` → `[{ date }]` (solo fechas con nota) para marcar en el calendario los días que tienen nota. — 2026-10-16
 - [ ] (De Claude para Codex) `getEvents` trae todos los eventos y filtra en memoria. Por ahora sirve; más adelante filtrar en la consulta los eventos sin repetición que no tocan el rango. — 2026-10-16
 
 ---
@@ -193,3 +195,4 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - 2026-10-16 (Claude): patrón de datos en el front: la página compone un `*Loader` (Server Component que llama a `api.js`) dentro de `<Suspense>` con skeleton, y le pasa los datos a un Client Component que mantiene la lista con `useCollection` y llama a las Server Actions con `useMutation` (toast de error y resultado `{ ok }`). Búsqueda sin tildes con `lib/utils/search.js`.
 - 2026-10-16 (Claude): fechas en el front con `lib/utils/dates.js` (date-fns + `@date-fns/tz`), siempre en `America/Argentina/Buenos_Aires` para que servidor y navegador coincidan. Los colores de categorías se eligen de `TONE_SWATCHES` (hex de los tonos pastel) o color libre.
 - 2026-10-16 (Claude): Tiptap 3.31.3 con versiones exactas (todas las `@tiptap/*` tienen que coincidir). Los colores de texto y resaltado se guardan en el JSON como `var(--ink-*)` / `var(--mark-*)`, así se adaptan al modo oscuro. Autoguardado con `lib/hooks/useAutosave.js` + `components/ui/SaveStatus`.
+- 2026-10-16 (Claude): Calendario: vista, días y fecha viven en la URL (`/calendario?vista=semana&dias=7&fecha=YYYY-MM-DD`); el servidor carga el rango y después de cada mutación se hace `router.refresh()`. Eventos de día completo: `startAt` = medianoche del primer día y `endAt` = medianoche del día siguiente al último (fin exclusivo), en hora de Argentina. Al editar "todos" desde una repetición, el front manda solo los campos cambiados y corre el DTSTART de la serie lo mismo que se movió la repetición.

@@ -18,7 +18,7 @@ export const INK_COLORS = [
 export function createExtensions({ placeholder, compact }) {
   return [
     StarterKit.configure({
-      heading: { levels: compact ? [2, 3] : [1, 2, 3] },
+      heading: { levels: [1, 2, 3] },
       codeBlock: false,
       code: false,
       link: {

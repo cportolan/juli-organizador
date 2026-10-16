@@ -21,15 +21,15 @@
   background: var(--tone-butter);
 }
 
-[data-status="saving"] .icon {
+.status[data-status="saving"] .icon {
   animation: spin 0.9s linear infinite;
 }
 
-[data-status="saved"] .icon {
+.status[data-status="saved"] .icon {
   color: var(--success);
 }
 
-[data-status="error"] {
+.status[data-status="error"] {
   color: var(--danger-strong);
 }
 
