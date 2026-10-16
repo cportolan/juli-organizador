@@ -29,7 +29,7 @@ Este contrato es lo que permite trabajar en paralelo. Claude construye la UI con
 
 ### Convenciones
 - Cada sección tiene `features/<seccion>/api.js` (lecturas, usable desde Server Components) y `features/<seccion>/actions.js` (`"use server"`, mutaciones).
-- Las funciones son `async`, devuelven los datos directamente y **lanzan `Error` con mensaje en español** si algo falla.
+- Las funciones son `async`. Las lecturas de `api.js` devuelven datos directamente y pueden lanzar `Error` con mensaje en español. Las Server Actions devuelven `{ ok: true, data }` o `{ ok: false, error: "mensaje" }` para errores esperables; las excepciones quedan reservadas para fallas inesperadas.
 - Fechas: strings ISO 8601. Fechas sin hora (`date`): `YYYY-MM-DD`.
 - Nombres de campos en `camelCase` en JS (la capa de api convierte desde `snake_case` de Postgres).
 - Mientras no exista la implementación real, Claude usa mocks en `features/<seccion>/mocks.js` con la misma forma de datos. Se borran cuando el backend está listo.
@@ -100,14 +100,14 @@ Este contrato es lo que permite trabajar en paralelo. Claude construye la UI con
 ## Fase 1 — Base (en paralelo)
 
 ### Codex — backend base (branch `feat/backend-base`)
-- [ ] Instalar `@supabase/supabase-js`, `@supabase/ssr`, `bcryptjs`
-- [ ] `lib/supabase/client.js` (browser) y `lib/supabase/server.js` (server, con cookies) usando `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-- [ ] `proxy.js` (en Next 16 reemplaza a `middleware.js`; revisar `node_modules/next/dist/docs/`): refrescar sesión y redirigir a `/login` si no hay usuario, y de `/login` a `/calendario` si ya hay
-- [ ] Migración inicial en `supabase/migrations/`: todas las tablas del modelo, índices, triggers de `updated_at`, RLS en todas las tablas
-- [ ] Bucket privado `attachments` con políticas por `user_id` (ruta `<user_id>/<person_id>/<archivo>`)
-- [ ] Auth: `features/auth/api.js` y `actions.js`
-- [ ] Settings: api + actions (crear fila por defecto si no existe: primario pastel, `themeMode: 'system'`, Lora / Roboto)
-- [ ] Documentar en `supabase/README.md` cómo aplicar las migraciones
+- [x] Instalar `@supabase/supabase-js`, `@supabase/ssr`, `bcryptjs`
+- [x] `lib/supabase/client.js` (browser) y `lib/supabase/server.js` (server, con cookies) usando `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- [x] `proxy.js` (en Next 16 reemplaza a `middleware.js`; revisar `node_modules/next/dist/docs/`): refrescar sesión y redirigir a `/login` si no hay usuario, y de `/login` a `/calendario` si ya hay
+- [x] Migración inicial en `supabase/migrations/`: todas las tablas del modelo, índices, triggers de `updated_at`, RLS en todas las tablas
+- [x] Bucket privado `attachments` con políticas por `user_id` (ruta `<user_id>/<person_id>/<archivo>`)
+- [x] Auth: `features/auth/api.js` y `actions.js`
+- [x] Settings: api + actions (crear fila por defecto si no existe: primario pastel, `themeMode: 'system'`, Lora / Roboto)
+- [x] Documentar en `supabase/README.md` cómo aplicar las migraciones
 
 ### Claude — sistema de diseño y layout (branch `feat/frontend-base`)
 - [ ] Usar las skills de diseño UX/UI; definir dirección visual (paleta pastel, tipografía, espaciado, radios, sombras, motion)
@@ -167,3 +167,7 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 
 <!-- Formato: - YYYY-MM-DD (agente): decisión -->
 - 2026-10-16 (Claude): reparto backend/infra → Codex, frontend/diseño → Claude. Contrato de api definido arriba.
+- 2026-10-16 (Codex): clientes SSR usan `@supabase/ssr` y cookies async de Next 16; `proxy.js` refresca la sesión con `auth.getUser()` y solo hace redirecciones optimistas.
+- 2026-10-16 (Codex): la migración usa una columna interna `storage_path` para adjuntos; el contrato público sigue exponiendo URLs firmadas temporales cuando se implemente la sección de Usuarios.
+- 2026-10-16 (Codex): se fijaron versiones exactas de las dependencias backend; lint y build pasan. La validación contra una base Supabase real queda para cuando se configure el proyecto/CLI.
+- 2026-10-16 (Codex): todas las Server Actions modelan resultados esperables como `{ ok: true, data }` o `{ ok: false, error }`; las lecturas de `api.js` mantienen excepciones. La migración otorga acceso Data API a `authenticated` y RLS conserva el aislamiento por `user_id`.
