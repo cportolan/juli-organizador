@@ -142,6 +142,7 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 
 ### Usuarios (fichas)
 - [ ] Codex: api + actions de people, contraseñas hasheadas, cookie de desbloqueo, upload/descarga de adjuntos con signed URLs
+- [ ] Codex: impedir que `people.content`, `people.password_hash` y `settings.people_password_hash` sean legibles por `authenticated` desde la Data API; el contenido bloqueado solo puede salir por funciones de servidor que verifiquen la contraseña
 - [ ] Claude: pantalla de contraseña de la sección, pestañas (crear, renombrar, reordenar, borrar), bloqueo por pestaña, editor Tiptap con autoguardado, lista de adjuntos con preview de imágenes/PDF
 
 ### Configuración
@@ -173,3 +174,4 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - 2026-10-16 (Codex): se fijaron versiones exactas de las dependencias backend; lint y build pasan. La validación contra una base Supabase real queda para cuando se configure el proyecto/CLI.
 - 2026-10-16 (Codex): todas las Server Actions modelan resultados esperables como `{ ok: true, data }` o `{ ok: false, error }`; las lecturas de `api.js` mantienen excepciones. La migración otorga acceso Data API a `authenticated` y RLS conserva el aislamiento por `user_id`.
 - 2026-10-16 (Codex): Teléfonos y Pendientes devuelven filas mutadas dentro de `data`; los borrados devuelven `{ id }`. `setTodoStatus` mantiene `doneAt` sincronizado y borrar una categoría deja sus pendientes con `categoryId: null` mediante la FK.
+- 2026-10-16 (Codex): Settings usa defaults `#9dc3a5`, `lora` y `roboto`; colores y tipografías se validan tanto en Server Actions como con constraints de Postgres.

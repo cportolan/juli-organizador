@@ -12,10 +12,18 @@ const FIELD_MAP = {
   peopleLockEnabled: 'people_lock_enabled',
 }
 
+const THEME_MODES = new Set(['light', 'dark', 'system'])
+const HEADING_FONTS = new Set(['lora', 'fraunces', 'playfair', 'dm-serif'])
+const BODY_FONTS = new Set(['roboto', 'inter', 'nunito', 'dm-sans'])
+const HEX_COLOR = /^#[0-9a-fA-F]{6}$/
+
 export async function updateSettings(partialSettings) {
   const context = await getActionContext()
   if (!context.ok) return context.result
   const { supabase, user } = context
+
+  const validationError = validateSettings(partialSettings)
+  if (validationError) return actionError(validationError)
 
   const update = Object.entries(partialSettings ?? {}).reduce((result, [key, value]) => {
     if (FIELD_MAP[key] && value !== undefined) result[FIELD_MAP[key]] = value
@@ -36,6 +44,28 @@ export async function updateSettings(partialSettings) {
     createdAt: data.created_at,
     updatedAt: data.updated_at,
   })
+}
+
+function validateSettings(settings) {
+  if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
+    return 'La configuración no es válida.'
+  }
+  if (Object.hasOwn(settings, 'primaryColor') && (typeof settings.primaryColor !== 'string' || !HEX_COLOR.test(settings.primaryColor))) {
+    return 'El color primario no es válido.'
+  }
+  if (Object.hasOwn(settings, 'themeMode') && !THEME_MODES.has(settings.themeMode)) {
+    return 'El modo de tema no es válido.'
+  }
+  if (Object.hasOwn(settings, 'headingFont') && !HEADING_FONTS.has(settings.headingFont)) {
+    return 'La tipografía de títulos no es válida.'
+  }
+  if (Object.hasOwn(settings, 'bodyFont') && !BODY_FONTS.has(settings.bodyFont)) {
+    return 'La tipografía de texto no es válida.'
+  }
+  if (Object.hasOwn(settings, 'peopleLockEnabled') && typeof settings.peopleLockEnabled !== 'boolean') {
+    return 'La configuración de bloqueo no es válida.'
+  }
+  return null
 }
 
 export async function setPeoplePassword({ currentPassword, newPassword } = {}) {

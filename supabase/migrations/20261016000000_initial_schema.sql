@@ -3,10 +3,10 @@ create extension if not exists pgcrypto;
 create table public.settings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null unique references auth.users(id) on delete cascade,
-  primary_color text not null default '#c98f9b',
+  primary_color text not null default '#9dc3a5' check (primary_color ~ '^#[0-9a-fA-F]{6}$'),
   theme_mode text not null default 'system' check (theme_mode in ('light', 'dark', 'system')),
-  heading_font text not null default 'Lora',
-  body_font text not null default 'Roboto',
+  heading_font text not null default 'lora' check (heading_font in ('lora', 'fraunces', 'playfair', 'dm-serif')),
+  body_font text not null default 'roboto' check (body_font in ('roboto', 'inter', 'nunito', 'dm-sans')),
   people_lock_enabled boolean not null default false,
   people_password_hash text,
   created_at timestamptz not null default now(),
@@ -56,7 +56,7 @@ create table public.todo_categories (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   name text not null,
-  color text not null default '#c98f9b',
+  color text not null default '#c98f9b' check (color ~ '^#[0-9a-fA-F]{6}$'),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (user_id, name)
