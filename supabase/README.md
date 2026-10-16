@@ -76,3 +76,53 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_build_placeholder npx next b
 y devuelve únicamente `{ date }` de las notas guardadas. `getEvents` filtra los
 eventos simples en Postgres y conserva series/excepciones para expandirlas sin
 perder exclusiones.
+
+## Subida directa de adjuntos (`feat/direct-uploads`)
+
+La migración `20261016183910_direct_attachment_uploads.sql` ya está aplicada al
+proyecto juli-organizador; en otros entornos, aplicarla antes de conectar el helper.
+Agrega `attachment_uploads` (privada, RLS, acceso exclusivo de service_role) y fija
+el límite real del bucket en 10 MiB. No se abre ninguna política de Storage al
+navegador: la autorización es un token firmado para una única ruta temporal,
+con `upsert: false`.
+
+El flujo es `createAttachmentUpload(metadata)` → navegador
+`uploadToSignedUrl(path, token, file)` → `confirmAttachmentUpload({ uploadId })`.
+Ambas actions verifican sesión, sección y permiso de ficha. La confirmación
+consulta tamaño/MIME reales y lee con Range hasta 64 KiB para raster/PDF. Para
+ZIP/OpenXML y texto UTF-8 lee el objeto completo, acotado a 10 MiB, porque la
+inspección del contenedor o del texto necesita más que su cabecera. Ningún
+archivo viaja en el cuerpo de una Server Action.
+
+Después de validar, se copia a una ruta definitiva distinta de la autorizada
+por el token y se crea metadata con el ID de la subida. Reconfirmar devuelve el
+mismo adjunto; una confirmación concurrente se rechaza mientras está en curso.
+Si falla la validación, se eliminan los objetos y no se publica el adjunto.
+
+Los intents se conservan tres horas (tokens de Supabase: dos horas). Al crear
+subidas o listar adjuntos se limpian hasta 20 intents vencidos del usuario,
+con sus objetos temporales; también las rutas definitivas sin metadata. Los
+registros sobreviven al borrado de la ficha para poder limpiar sus archivos.
+Esta limpieza es oportunista: sin actividad, los temporales pueden permanecer
+más tiempo. El registro se conserva ante fallas para reintentar la limpieza.
+
+Claude puede cambiar únicamente la exportación en `peopleService.js`:
+
+```js
+export { uploadAttachmentFile as uploadAttachment } from '@/features/people/uploadAttachmentFile'
+```
+
+El helper admite `{ personId, title, file }` y el `FormData` existente. Devuelve
+`{ ok, data | error }` con la forma habitual del adjunto.
+
+Por compatibilidad se conserva la action anterior y el bodySizeLimit de 11 MiB
+mientras la UI todavía los usa. Después de conectar el helper, Codex puede
+retirar `uploadAttachment`/`uploadFile` y el override de `next.config.mjs` para
+volver al límite por defecto, sin afectar subidas existentes durante el handoff.
+
+Pruebas adicionales:
+
+```sh
+node --experimental-loader ./lib/server/people/testing/loader.mjs --test lib/server/people/directUploads.test.mjs
+psql "$TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/direct_upload_security.sql
+```

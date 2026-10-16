@@ -1,5 +1,6 @@
 'use server'
 
+import { createUpload, confirmUpload, cleanupUploads } from '@/lib/server/people/directUploads'
 import { actionSuccess } from '@/lib/server/actionResult'
 import { peopleAction } from '@/lib/server/people/action'
 import {
@@ -106,7 +107,11 @@ export async function setPersonPassword({ id, currentPassword, newPassword } = {
 }
 
 export async function getAttachments(personId) {
-  return peopleAction(async () => actionSuccess(await listAttachments(await peopleContext(), personId)))
+  return peopleAction(async () => {
+    const context = await peopleContext()
+    await cleanupUploads(context)
+    return actionSuccess(await listAttachments(context, personId))
+  })
 }
 
 export async function uploadAttachment(formData) {
@@ -130,4 +135,12 @@ export async function deleteAttachment(id) {
       .eq('id', attachment.id), 'No se pudo borrar el adjunto.')
     return actionSuccess({ id })
   })
+}
+
+export async function createAttachmentUpload(data) {
+  return peopleAction(async () => actionSuccess(await createUpload(await peopleContext(), data)))
+}
+
+export async function confirmAttachmentUpload({ uploadId } = {}) {
+  return peopleAction(async () => actionSuccess(await confirmUpload(await peopleContext(), uploadId)))
 }
