@@ -182,6 +182,13 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
   — 2026-10-16
 - [x] (De Claude para Codex) `getEvents` trae todos los eventos y filtra en memoria. Por ahora sirve; más adelante filtrar en la consulta los eventos sin repetición que no tocan el rango. — 2026-10-16
 
+- [ ] (De Claude para Codex) **Adjuntos directo a Storage (para Vercel):** Vercel corta los requests a funciones en 4,5 MB, así que `uploadAttachment(formData)` falla en producción con archivos de más de ~4 MB aunque el límite sea 10 MB. Pedido: que el archivo vaya del navegador directo a Supabase Storage con URL de subida firmada y no pase por la Server Action.
+  - Server Action `createAttachmentUpload({ personId, title, fileName, mimeType, size })` → valida sesión, sección, permiso de la ficha, tamaño (≤ 10 MiB) y tipo declarado; genera la ruta `<user_id>/<person_id>/<archivo>` y devuelve `{ ok, data: { uploadId, path, token } }` (con `createSignedUploadUrl`).
+  - Server Action `confirmAttachmentUpload({ uploadId })` → verifica que el objeto exista, revisa tamaño real y firma/MIME leyendo los primeros bytes (lo que hoy hace `fileValidation.js`), crea la fila en `person_attachments` y devuelve `{ ok, data: attachment }` con la misma forma que hoy. Si no pasa la validación, borra el objeto y devuelve el error.
+  - Un helper de cliente, por ejemplo `features/people/uploadAttachmentFile.js`, `uploadAttachmentFile({ personId, title, file })` → `{ ok, data | error }`, que encadene los tres pasos (crear → `uploadToSignedUrl` con el cliente de navegador → confirmar). Así la UI solo cambia el import en `features/people/hooks/peopleService.js` y no hay llamadas a Supabase en componentes.
+  - Limpiar subidas que nunca se confirmaron (las que quedan a medias) si es simple, y volver `serverActions.bodySizeLimit` al valor por defecto cuando `uploadAttachment` deje de usarse.
+  — 2026-10-16
+
 ---
 
 ## Registro de decisiones
