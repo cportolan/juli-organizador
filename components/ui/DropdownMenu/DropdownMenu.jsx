@@ -61,7 +61,7 @@ export default function DropdownMenu({
           {triggerLabel}
         </Button>
       ) : (
-        <IconButton {...triggerProps} icon={icon} label={label} className={className} />
+        <IconButton {...triggerProps} icon={icon} label={label} className={className} tooltip={false} />
       )}
       <div
         ref={menuRef}

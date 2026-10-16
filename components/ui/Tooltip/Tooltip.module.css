@@ -18,18 +18,31 @@
   font-weight: 500;
   white-space: nowrap;
   pointer-events: none;
+  /* Oculto con display: none para que no ocupe lugar: si no, los tooltips
+     de botones pegados al borde generan scroll horizontal. */
+  display: none;
   opacity: 0;
   transform: translate(var(--shift-x), var(--shift-y)) scale(0.96);
   transition:
     opacity var(--dur-fast) var(--ease-out),
-    transform var(--dur-fast) var(--ease-out);
+    transform var(--dur-fast) var(--ease-out),
+    display var(--dur-fast) allow-discrete;
 }
 
 .wrapper:hover > .tooltip,
 .wrapper:has(:focus-visible) > .tooltip {
+  display: block;
   opacity: 1;
   transform: translate(var(--shift-x), var(--shift-y)) scale(1);
   transition-delay: 350ms;
+}
+
+@starting-style {
+  .wrapper:hover > .tooltip,
+  .wrapper:has(:focus-visible) > .tooltip {
+    opacity: 0;
+    transform: translate(var(--shift-x), var(--shift-y)) scale(0.96);
+  }
 }
 
 .top {
