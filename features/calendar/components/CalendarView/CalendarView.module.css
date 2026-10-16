@@ -1,0 +1,16 @@
+.calendar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.view {
+  animation: rise-in var(--dur) var(--ease-out);
+  transition: opacity var(--dur) var(--ease-out);
+}
+
+/* Mientras llega el nuevo rango, la vista anterior queda atenuada */
+.pending {
+  opacity: 0.55;
+  transition-delay: 120ms;
+}

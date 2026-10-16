@@ -24,13 +24,13 @@ import styles from "./RichTextEditor.module.css";
 const MARKS = [
   { id: "bold", label: "Negrita (Ctrl+B)", icon: Bold, run: (chain) => chain.toggleBold() },
   { id: "italic", label: "Cursiva (Ctrl+I)", icon: Italic, run: (chain) => chain.toggleItalic() },
-  { id: "underline", label: "Subrayado (Ctrl+U)", icon: Underline, run: (chain) => chain.toggleUnderline() },
+  { id: "underline", label: "Subrayado (Ctrl+U)", icon: Underline, run: (chain) => chain.toggleUnderline(), full: true },
   { id: "strike", label: "Tachado", icon: Strikethrough, run: (chain) => chain.toggleStrike() },
 ];
 
 const BLOCKS = [
   { id: "bulletList", label: "Lista con viñetas", icon: List, run: (chain) => chain.toggleBulletList() },
-  { id: "orderedList", label: "Lista numerada", icon: ListOrdered, run: (chain) => chain.toggleOrderedList() },
+  { id: "orderedList", label: "Lista numerada", icon: ListOrdered, run: (chain) => chain.toggleOrderedList(), full: true },
   { id: "taskList", label: "Lista de tareas", icon: ListChecks, run: (chain) => chain.toggleTaskList() },
   { id: "blockquote", label: "Cita", icon: Quote, run: (chain) => chain.toggleBlockquote(), full: true },
 ];
@@ -74,9 +74,13 @@ export default function EditorToolbar({ editor, compact, extra }) {
 
   return (
     <div className={styles.toolbar} role="toolbar" aria-label="Formato de texto">
-      <HeadingSelect editor={editor} value={state.heading} compact={compact} />
-      <span className={styles.divider} aria-hidden />
-      {MARKS.map(button)}
+      {!compact && (
+        <>
+          <HeadingSelect editor={editor} value={state.heading} />
+          <span className={styles.divider} aria-hidden />
+        </>
+      )}
+      {MARKS.filter((item) => !compact || !item.full).map(button)}
       <ColorMenu editor={editor} color={state.color} highlight={state.highlight} />
       <span className={styles.divider} aria-hidden />
       {BLOCKS.filter((item) => !compact || !item.full).map(button)}

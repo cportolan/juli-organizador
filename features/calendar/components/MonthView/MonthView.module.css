@@ -1,0 +1,118 @@
+.month {
+  display: flex;
+  flex-direction: column;
+  height: max(560px, calc(100dvh - 200px));
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  padding-block: var(--space-2);
+  border-bottom: 1px solid var(--border-strong);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.weekdays span {
+  padding-left: var(--space-2);
+}
+
+.grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: repeat(var(--weeks), minmax(0, 1fr));
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  min-height: 0;
+  padding: var(--space-1);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  cursor: cell;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.cell:nth-child(7n) {
+  border-right: none;
+}
+
+.cell:hover {
+  background: color-mix(in oklab, var(--surface-2) 60%, transparent);
+}
+
+.selected {
+  background: var(--primary-softer);
+}
+
+.outside .number {
+  color: var(--text-subtle);
+}
+
+.outside .events {
+  opacity: 0.6;
+}
+
+.number {
+  align-self: flex-start;
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding-inline: 4px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.number:hover {
+  background: var(--surface-3);
+}
+
+.today,
+.today:hover {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.events {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.more {
+  align-self: flex-start;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.more:hover {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .cell {
+    padding: 2px;
+  }
+
+  .number {
+    min-width: 24px;
+    height: 24px;
+    font-size: var(--text-xs);
+  }
+}

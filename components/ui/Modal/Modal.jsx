@@ -29,7 +29,11 @@ export default function Modal({
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      // showModal enfoca el primer botón (la X); en formularios es mejor arrancar en el primer campo.
+      dialog.querySelector(`.${styles.body} :is(input:not([type="hidden"]), textarea, select)`)?.focus();
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
 

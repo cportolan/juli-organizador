@@ -1,0 +1,144 @@
+.grid {
+  --gutter: 56px;
+  --hour: 52px;
+  --minute: calc(var(--hour) / 60);
+
+  display: flex;
+  flex-direction: column;
+  height: max(520px, calc(100dvh - 200px));
+  border-top: 1px solid var(--border-strong);
+}
+
+.head,
+.allDay,
+.body {
+  display: grid;
+  grid-template-columns: var(--gutter) repeat(var(--days), minmax(0, 1fr));
+}
+
+.head {
+  padding-block: var(--space-2);
+}
+
+.dayHead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-1) 0;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.dayHead:hover {
+  background: var(--surface-2);
+}
+
+.weekday {
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.dayNumber {
+  display: grid;
+  place-items: center;
+  min-width: 36px;
+  height: 36px;
+  padding-inline: 6px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  transition:
+    background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out);
+}
+
+.isSelected .dayNumber {
+  background: var(--surface-3);
+}
+
+.isToday .weekday {
+  color: var(--primary-strong);
+  font-weight: 600;
+}
+
+.isToday .dayNumber {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.allDay {
+  border-bottom: 1px solid var(--border);
+  min-height: 12px;
+}
+
+.gutterLabel {
+  align-self: center;
+  padding-right: var(--space-2);
+  font-size: 10px;
+  line-height: 1.1;
+  text-align: right;
+  color: var(--text-subtle);
+  opacity: 0;
+}
+
+.hasAllDay .gutterLabel {
+  opacity: 1;
+}
+
+.allDayCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  min-height: 12px;
+  padding: 3px 4px;
+  border-left: 1px solid var(--border);
+  cursor: cell;
+}
+
+.hasAllDay .allDayCell {
+  min-height: 30px;
+}
+
+.scroller {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.body {
+  height: calc(var(--hour) * 24);
+}
+
+.hours {
+  position: relative;
+  display: grid;
+  grid-template-rows: repeat(24, var(--hour));
+}
+
+.hour {
+  position: relative;
+  top: -0.6em;
+  padding-right: var(--space-2);
+  font-size: var(--text-xs);
+  text-align: right;
+  color: var(--text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    --gutter: 44px;
+    --hour: 48px;
+  }
+
+  .dayNumber {
+    min-width: 30px;
+    height: 30px;
+    font-size: var(--text-md);
+  }
+}

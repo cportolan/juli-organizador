@@ -1,0 +1,66 @@
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-width: 0;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--radius-xs);
+  font-size: var(--text-xs);
+  line-height: 1;
+  text-align: left;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+  animation: fade-in var(--dur) var(--ease-out);
+}
+
+.chip:hover {
+  background: color-mix(in oklab, var(--event) 22%, transparent);
+}
+
+.chip:active {
+  transform: scale(0.98);
+}
+
+.filled {
+  background: color-mix(in oklab, var(--event) 45%, var(--surface));
+  color: color-mix(in oklab, var(--event) 25%, var(--text));
+  font-weight: 500;
+}
+
+.filled:hover {
+  background: color-mix(in oklab, var(--event) 60%, var(--surface));
+}
+
+:global([data-theme="dark"]) .filled {
+  background: color-mix(in oklab, var(--event) 30%, var(--surface));
+  color: var(--text);
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--event);
+}
+
+.time {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

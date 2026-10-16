@@ -51,8 +51,83 @@
   pointer-events: none;
 }
 
+.fab,
+.scrim {
+  display: none;
+}
+
+/* Pantallas angostas: hoja que entra desde la derecha */
 @media (max-width: 1100px) {
-  .panel {
-    display: none;
+  .panel,
+  .closed {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 95;
+    width: min(360px, 100vw);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+      transform var(--dur-slow) var(--ease-out),
+      visibility 0s var(--dur-slow);
+  }
+
+  .sheetOpen {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+
+  .closed .title,
+  .closed .actions,
+  .closed .body {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .body {
+    width: auto;
+  }
+
+  .fab {
+    position: fixed;
+    right: var(--space-4);
+    bottom: var(--space-4);
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-lg);
+    background: var(--primary);
+    color: var(--on-primary);
+    box-shadow: var(--shadow-md);
+    transition: transform var(--dur) var(--ease-spring);
+  }
+
+  .fab:active {
+    transform: scale(0.94);
+  }
+
+  .fab svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 94;
+    display: block;
+    background: rgb(var(--shadow-color) / 0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-slow) var(--ease-out);
+  }
+
+  .scrimVisible {
+    opacity: 1;
+    pointer-events: auto;
   }
 }

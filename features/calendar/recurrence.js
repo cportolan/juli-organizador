@@ -1,6 +1,8 @@
-import rrule from 'rrule'
+import * as rruleModule from 'rrule'
 
-const { RRule } = rrule
+// Node carga el build CommonJS de rrule (solo `default`) y el bundler de Next
+// el ESM (solo exports con nombre): se toma RRule de donde esté.
+const { RRule } = rruleModule.RRule ? rruleModule : rruleModule.default
 
 const ALLOWED_FREQUENCIES = new Set([RRule.DAILY, RRule.WEEKLY, RRule.MONTHLY, RRule.YEARLY])
 const CALENDAR_TIME_ZONE = 'America/Argentina/Buenos_Aires'
