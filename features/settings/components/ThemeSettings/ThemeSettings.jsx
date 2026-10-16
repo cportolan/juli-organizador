@@ -9,6 +9,7 @@ import {
   THEME_MODES,
 } from "@/lib/theme/themeConfig";
 import { useTheme } from "@/lib/theme/useTheme";
+import { useSaveTheme } from "@/features/settings/hooks/useSaveTheme";
 import Button from "@/components/ui/Button/Button";
 import ColorSwatches from "@/components/ui/ColorSwatches/ColorSwatches";
 import SegmentedControl from "@/components/ui/SegmentedControl/SegmentedControl";
@@ -21,7 +22,8 @@ const MODE_ICONS = { light: Sun, dark: Moon, system: Monitor };
 const MODE_ITEMS = THEME_MODES.map((mode) => ({ ...mode, icon: MODE_ICONS[mode.id] }));
 
 export default function ThemeSettings() {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
+  const setTheme = useSaveTheme();
 
   return (
     <div className={styles.layout}>

@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { LogOut, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { cx } from "@/lib/utils/cx";
 import { MAIN_NAV, SETTINGS_NAV } from "@/lib/navigation";
-import { signOut } from "@/features/auth/mocks";
+import { signOut } from "@/features/auth/actions";
+import { useToast } from "@/components/ui/Toast/Toast";
 import IconButton from "@/components/ui/IconButton/IconButton";
 import SidebarNavList from "./SidebarNavList";
 import SidebarToday from "./SidebarToday";
@@ -13,10 +14,16 @@ import styles from "./Sidebar.module.css";
 
 export default function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobile }) {
   const router = useRouter();
+  const toast = useToast();
 
   async function handleSignOut() {
-    await signOut();
+    const result = await signOut();
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
     router.replace("/login");
+    router.refresh();
   }
 
   return (

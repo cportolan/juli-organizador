@@ -1,7 +1,7 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "@/lib/theme/useTheme";
+import { useSaveTheme } from "@/features/settings/hooks/useSaveTheme";
 import IconButton from "@/components/ui/IconButton/IconButton";
 import styles from "./Sidebar.module.css";
 
@@ -18,11 +18,11 @@ function ThemeIcon({ className }) {
 
 /** Alterna claro/oscuro desde el sidebar (el detalle está en Configuración). */
 export default function ThemeQuickToggle() {
-  const { setTheme } = useTheme();
+  const saveTheme = useSaveTheme();
 
   function toggle() {
     const isDark = document.documentElement.dataset.theme === "dark";
-    setTheme({ themeMode: isDark ? "light" : "dark" });
+    saveTheme({ themeMode: isDark ? "light" : "dark" });
   }
 
   return <IconButton icon={ThemeIcon} label="Cambiar tema" tooltipSide="right" onClick={toggle} />;

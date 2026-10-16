@@ -120,7 +120,7 @@ Este contrato es lo que permite trabajar en paralelo. Claude construye la UI con
 - [x] Pantalla de login (con `features/auth/mocks.js`)
 - [x] Rutas con transiciones: `/calendario`, `/telefonos`, `/pendientes`, `/usuarios`, `/configuracion`
 - [x] Configuración de tema (color, modo, tipografías) — se guarda en `localStorage` (`oj-theme`)
-- [ ] Al mergear backend: reemplazar `features/auth/mocks.js` por `features/auth/actions.js` y sincronizar el tema con `getSettings`/`updateSettings`
+- [x] Al mergear backend: reemplazar `features/auth/mocks.js` por `features/auth/actions.js` y sincronizar el tema con `getSettings`/`updateSettings`
 
 **Merge de Fase 1:** primero `feat/backend-base`, después `feat/frontend-base` (Claude conecta login y settings a lo real al hacer rebase).
 
