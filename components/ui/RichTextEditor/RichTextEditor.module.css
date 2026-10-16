@@ -1,0 +1,360 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* --- Barra de herramientas --- */
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.compact .toolbar {
+  min-height: 38px;
+  padding: 2px var(--space-1);
+  border-bottom: none;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.divider {
+  width: 1px;
+  height: 18px;
+  margin-inline: var(--space-1);
+  background: var(--border);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.headingSelect {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.headingSelect select {
+  appearance: none;
+  height: 30px;
+  padding: 0 26px 0 var(--space-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.headingSelect select:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.headingSelect svg {
+  position: absolute;
+  right: 6px;
+  width: 14px;
+  height: 14px;
+  color: var(--text-subtle);
+  pointer-events: none;
+}
+
+/* --- Colores y link --- */
+
+.colorMenu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.colorRow {
+  border: none;
+}
+
+.colorRow legend {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.colorOptions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.colorOption {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.colorOption:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.colorOption[aria-pressed="true"] {
+  border-color: var(--text);
+  box-shadow: 0 0 0 1px var(--text);
+}
+
+.colorNone svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-subtle);
+}
+
+.inkOption {
+  color: var(--option);
+}
+
+.markOption {
+  background: var(--option);
+}
+
+.linkForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 280px;
+}
+
+.linkActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* --- Superficie de escritura --- */
+
+.surface {
+  flex: 1;
+  min-height: 0;
+}
+
+.loading {
+  min-height: 160px;
+}
+
+.content {
+  min-height: 100%;
+  padding: var(--space-6) var(--space-2);
+  outline: none;
+  font-size: var(--text-md);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.compact .content {
+  padding: var(--space-2) var(--space-1);
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+.content > * + * {
+  margin-top: 0.6em;
+}
+
+.content :global(p.is-editor-empty:first-child::before) {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--text-subtle);
+  pointer-events: none;
+}
+
+.content h1,
+.content h2,
+.content h3 {
+  margin-top: 1.4em;
+}
+
+.content > :first-child {
+  margin-top: 0;
+}
+
+.content h1 {
+  font-size: var(--text-2xl);
+}
+
+.content h2 {
+  font-size: var(--text-xl);
+}
+
+.content h3 {
+  font-size: var(--text-lg);
+}
+
+.compact .content h2 {
+  font-size: var(--text-lg);
+}
+
+.compact .content h3 {
+  font-size: var(--text-md);
+}
+
+.content strong {
+  font-weight: 600;
+}
+
+.content a {
+  color: var(--primary-strong);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--primary-strong) 40%, transparent);
+  text-underline-offset: 3px;
+  cursor: text;
+}
+
+.content mark {
+  padding: 0.05em 0.15em;
+  border-radius: 3px;
+  background: var(--mark-butter);
+  color: inherit;
+  box-decoration-break: clone;
+}
+
+.content ul,
+.content ol {
+  padding-left: 1.4em;
+}
+
+.content li + li {
+  margin-top: 0.2em;
+}
+
+.content li::marker {
+  color: var(--text-subtle);
+}
+
+.content blockquote {
+  padding-left: var(--space-4);
+  border-left: 3px solid var(--primary);
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+  font-style: italic;
+}
+
+.content hr {
+  margin-block: 1.6em;
+  border: none;
+  border-top: 1px dashed var(--border-strong);
+}
+
+.content :global(.ProseMirror-selectednode) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Lista de tareas */
+.content ul[data-type="taskList"] {
+  padding-left: 0.2em;
+  list-style: none;
+}
+
+.content ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.content ul[data-type="taskList"] li > label {
+  flex-shrink: 0;
+  margin-top: 0.35em;
+  user-select: none;
+}
+
+.content ul[data-type="taskList"] li > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.content ul[data-type="taskList"] input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-strong);
+  cursor: pointer;
+}
+
+.content ul[data-type="taskList"] li[data-checked="true"] > div {
+  color: var(--text-subtle);
+  text-decoration: line-through;
+}
+
+/* Tablas */
+.content :global(.tableWrapper) {
+  margin-block: 1em;
+  overflow-x: auto;
+}
+
+.content table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: var(--text-base);
+}
+
+.content th,
+.content td {
+  position: relative;
+  min-width: 80px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-strong);
+  vertical-align: top;
+}
+
+.content th {
+  background: var(--surface-2);
+  font-weight: 600;
+  text-align: left;
+}
+
+.content th > *,
+.content td > * {
+  margin: 0;
+}
+
+.content :global(.selectedCell)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--primary-soft);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.content :global(.column-resize-handle) {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: -2px;
+  width: 4px;
+  background: var(--primary);
+  pointer-events: none;
+}
+
+.content:global(.resize-cursor) {
+  cursor: col-resize;
+}

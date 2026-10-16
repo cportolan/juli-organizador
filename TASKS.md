@@ -141,7 +141,7 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 ### Calendario
 - [x] Codex: api de eventos con expansión de recurrencias (`rrule`), edición/borrado con `scope`, day notes (migración `recurrence_id` revisada y aplicada)
 - [ ] Claude: vistas mes / semana (7-5-3) / día hechas a medida, crear evento haciendo clic o arrastrando, modal de evento con selector de repetición estilo Google Calendar, diálogo "solo este / siguientes / todos", anotador del día, RightSidebar de pendientes con flechas Pendiente ↔ Realizado
-- [ ] Claude: instalar Tiptap (se reutiliza en Usuarios y en el anotador del día) — componente único `components/ui/RichTextEditor`
+- [x] Claude: instalar Tiptap (se reutiliza en Usuarios y en el anotador del día) — componente único `components/ui/RichTextEditor` (branch `feat/rich-text-editor`)
 
 ### Usuarios (fichas)
 - [ ] Codex: api + actions de people, contraseñas hasheadas, cookie de desbloqueo, upload/descarga de adjuntos con signed URLs
@@ -192,3 +192,4 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - 2026-10-16 (Codex): las excepciones de una serie usan la columna interna `events.recurrence_id` para conservar la fecha original aunque se mueva la ocurrencia. La migración `20261016145525_add_event_recurrence_id.sql` fue revisada y aplicada a Supabase.
 - 2026-10-16 (Claude): patrón de datos en el front: la página compone un `*Loader` (Server Component que llama a `api.js`) dentro de `<Suspense>` con skeleton, y le pasa los datos a un Client Component que mantiene la lista con `useCollection` y llama a las Server Actions con `useMutation` (toast de error y resultado `{ ok }`). Búsqueda sin tildes con `lib/utils/search.js`.
 - 2026-10-16 (Claude): fechas en el front con `lib/utils/dates.js` (date-fns + `@date-fns/tz`), siempre en `America/Argentina/Buenos_Aires` para que servidor y navegador coincidan. Los colores de categorías se eligen de `TONE_SWATCHES` (hex de los tonos pastel) o color libre.
+- 2026-10-16 (Claude): Tiptap 3.31.3 con versiones exactas (todas las `@tiptap/*` tienen que coincidir). Los colores de texto y resaltado se guardan en el JSON como `var(--ink-*)` / `var(--mark-*)`, así se adaptan al modo oscuro. Autoguardado con `lib/hooks/useAutosave.js` + `components/ui/SaveStatus`.
