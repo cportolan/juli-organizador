@@ -1,0 +1,78 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.optional {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--text-subtle);
+}
+
+.hint,
+.error {
+  font-size: var(--text-xs);
+}
+
+.hint {
+  color: var(--text-muted);
+}
+
+.error {
+  color: var(--danger-strong);
+  animation: rise-in var(--dur) var(--ease-out);
+}
+
+/* Estilo compartido de controles (input, textarea, select) */
+.control {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+.control::placeholder {
+  color: var(--text-subtle);
+}
+
+.control:hover:not(:disabled) {
+  border-color: var(--border-strong);
+}
+
+.control:focus,
+.control:focus-visible {
+  outline: none;
+  border-color: var(--primary-strong);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.control[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.control[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+
+.control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

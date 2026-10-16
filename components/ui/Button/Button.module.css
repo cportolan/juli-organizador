@@ -1,0 +1,109 @@
+.button {
+  --btn-bg: transparent;
+  --btn-bg-hover: var(--surface-2);
+  --btn-fg: var(--text);
+  --btn-border: transparent;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--btn-height);
+  padding-inline: var(--btn-padding);
+  border: 1px solid var(--btn-border);
+  border-radius: var(--radius-sm);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-weight: 500;
+  font-size: var(--btn-font);
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.button:hover:not(:disabled) {
+  background: var(--btn-bg-hover);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.sm {
+  --btn-height: 32px;
+  --btn-padding: var(--space-3);
+  --btn-font: var(--text-sm);
+}
+
+.md {
+  --btn-height: 38px;
+  --btn-padding: var(--space-4);
+  --btn-font: var(--text-base);
+}
+
+.lg {
+  --btn-height: 46px;
+  --btn-padding: var(--space-6);
+  --btn-font: var(--text-md);
+}
+
+.primary {
+  --btn-bg: var(--primary);
+  --btn-bg-hover: var(--primary-hover);
+  --btn-fg: var(--on-primary);
+  box-shadow: var(--shadow-xs), inset 0 1px 0 rgb(255 255 255 / 0.25);
+}
+
+.secondary {
+  --btn-bg: var(--surface);
+  --btn-border: var(--border);
+  box-shadow: var(--shadow-xs);
+}
+
+.secondary:hover:not(:disabled) {
+  border-color: var(--border-strong);
+}
+
+.ghost {
+  --btn-fg: var(--text-muted);
+}
+
+.ghost:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.danger {
+  --btn-bg: var(--danger-soft);
+  --btn-bg-hover: color-mix(in oklab, var(--danger) 26%, var(--surface));
+  --btn-fg: var(--danger-strong);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.icon {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.spinner {
+  width: 1.1em;
+  height: 1.1em;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

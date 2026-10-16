@@ -1,0 +1,63 @@
+.group {
+  position: relative;
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  isolation: isolate;
+}
+
+.indicator {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  z-index: -1;
+  width: var(--indicator-w, 0);
+  border-radius: calc(var(--radius-sm) - 3px);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  opacity: var(--indicator-opacity, 0);
+  transform: translateX(var(--indicator-x, 0));
+}
+
+.group[data-indicator-ready] > .indicator {
+  transition:
+    transform var(--dur-slow) var(--ease-out),
+    width var(--dur-slow) var(--ease-out);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--height);
+  padding-inline: var(--space-3);
+  border-radius: calc(var(--radius-sm) - 3px);
+  font-size: var(--font-size);
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.option:hover,
+.option[data-active="true"] {
+  color: var(--text);
+}
+
+.sm {
+  --height: 26px;
+  --font-size: var(--text-xs);
+}
+
+.md {
+  --height: 32px;
+  --font-size: var(--text-sm);
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
