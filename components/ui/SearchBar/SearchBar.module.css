@@ -1,0 +1,21 @@
+.search {
+  width: 100%;
+  max-width: 340px;
+}
+
+.input {
+  background: var(--surface-2);
+  border-color: transparent;
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--border);
+}
+
+.input:focus {
+  background: var(--surface);
+}
+
+.input::-webkit-search-cancel-button {
+  display: none;
+}

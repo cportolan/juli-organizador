@@ -1,0 +1,74 @@
+.menu {
+  position: fixed;
+  inset: auto;
+  min-width: 190px;
+  margin: 0;
+  padding: var(--space-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-md);
+
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  transform-origin: top;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur) var(--ease-out),
+    overlay var(--dur-fast) allow-discrete,
+    display var(--dur-fast) allow-discrete;
+}
+
+.menu:popover-open {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .menu:popover-open {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 7px var(--space-3);
+  border-radius: var(--radius-xs);
+  font-size: var(--text-sm);
+  text-align: left;
+  color: var(--text);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.item:hover,
+.item:focus-visible {
+  outline: none;
+  background: var(--surface-2);
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.danger,
+.danger .icon {
+  color: var(--danger-strong);
+}
+
+.danger:hover,
+.danger:focus-visible {
+  background: var(--danger-soft);
+}
+
+.separator {
+  margin: var(--space-1) var(--space-2);
+  border: none;
+  border-top: 1px solid var(--border);
+}

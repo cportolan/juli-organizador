@@ -11,7 +11,7 @@ Especificación completa y reglas de código/diseño: `AGENTS.md`.
 | Agente | Rol | Es dueño de |
 | --- | --- | --- |
 | **Codex** | Backend + infraestructura | `supabase/`, `lib/supabase/`, `proxy.js` (ex middleware), `features/*/api.js`, `features/*/actions.js` (Server Actions), `lib/server/`, dependencias de backend |
-| **Claude** | Todo el frontend + diseño UX/UI | `app/**/*.module.css`, `app/globals.css`, `components/`, `features/*/components/`, `features/*/hooks/`, `lib/utils/` (helpers de UI), páginas y layouts de `app/`, animaciones, dependencias de frontend |
+| **Claude** | Todo el frontend + diseño UX/UI | `app/**/*.module.css`, `app/globals.css`, `components/`, `features/*/components/`, `features/*/hooks/`, `features/*/mocks.js`, `lib/utils/`, `lib/hooks/`, `lib/theme/`, `lib/navigation.js`, páginas y layouts de `app/`, animaciones, dependencias de frontend |
 
 Reglas para no pisarse:
 
@@ -29,7 +29,8 @@ Este contrato es lo que permite trabajar en paralelo. Claude construye la UI con
 
 ### Convenciones
 - Cada sección tiene `features/<seccion>/api.js` (lecturas, usable desde Server Components) y `features/<seccion>/actions.js` (`"use server"`, mutaciones).
-- Las funciones son `async`. Las lecturas de `api.js` devuelven datos directamente y pueden lanzar `Error` con mensaje en español. Las Server Actions devuelven `{ ok: true, data }` o `{ ok: false, error: "mensaje" }` para errores esperables; las excepciones quedan reservadas para fallas inesperadas.
+- Lecturas (`api.js`): `async`, devuelven los datos directamente y lanzan `Error` si algo falla (lo atrapa el `error.js` de la ruta).
+- Mutaciones (`actions.js`, Server Actions): **no lanzan errores esperables**, porque en producción Next oculta el mensaje de los errores lanzados. Devuelven `{ ok: true, data }` o `{ ok: false, error: "mensaje en español" }`.
 - Fechas: strings ISO 8601. Fechas sin hora (`date`): `YYYY-MM-DD`.
 - Nombres de campos en `camelCase` en JS (la capa de api convierte desde `snake_case` de Postgres).
 - Mientras no exista la implementación real, Claude usa mocks en `features/<seccion>/mocks.js` con la misma forma de datos. Se borran cuando el backend está listo.
@@ -110,14 +111,16 @@ Este contrato es lo que permite trabajar en paralelo. Claude construye la UI con
 - [x] Documentar en `supabase/README.md` cómo aplicar las migraciones
 
 ### Claude — sistema de diseño y layout (branch `feat/frontend-base`)
-- [ ] Usar las skills de diseño UX/UI; definir dirección visual (paleta pastel, tipografía, espaciado, radios, sombras, motion)
-- [ ] Instalar `lucide-react`, `date-fns`
-- [ ] `app/globals.css`: tokens como variables CSS (claro/oscuro, primario dinámico), reset, `prefers-reduced-motion`
-- [ ] Fuentes con `next/font`: Lora + Roboto por defecto y alternativas elegibles
-- [ ] Componentes base en `components/ui/`: Button, IconButton, Input, Textarea, Select, Checkbox, Modal, Drawer, Tabs, SegmentedControl, Badge, SearchBar, EmptyState, Skeleton, Toast, Tooltip, DropdownMenu, ConfirmDialog
-- [ ] Layout de la app: `components/layout/Sidebar` (colapsable, mobile), `Header`, contenedor del `RightSidebar`
-- [ ] Pantalla de login (con mocks hasta que esté auth)
-- [ ] Rutas vacías con transiciones: `/calendario`, `/telefonos`, `/pendientes`, `/usuarios`, `/configuracion`
+- [x] Definir dirección visual (paleta pastel "papel cálido", Lora/Roboto, radios, sombras suaves, motion)
+- [x] Instalar `lucide-react`, `date-fns`
+- [x] `app/globals.css`: tokens como variables CSS (claro/oscuro, primario dinámico con `color-mix`), reset, `prefers-reduced-motion`
+- [x] Fuentes con `next/font`: Lora + Roboto por defecto y alternativas elegibles (`lib/theme/fonts.js`)
+- [x] Componentes base en `components/ui/`: Button, IconButton, Field, Input, Textarea, Select, Checkbox, Modal, Drawer, Tabs, SegmentedControl, Badge, SearchBar, EmptyState, Skeleton, Toast, Tooltip, DropdownMenu, ConfirmDialog, ColorSwatches
+- [x] Layout de la app: `AppShell`, `Sidebar` (colapsable, mobile), `Page` (encabezado + transición), `RightSidebar`
+- [x] Pantalla de login (con `features/auth/mocks.js`)
+- [x] Rutas con transiciones: `/calendario`, `/telefonos`, `/pendientes`, `/usuarios`, `/configuracion`
+- [x] Configuración de tema (color, modo, tipografías) — se guarda en `localStorage` (`oj-theme`)
+- [ ] Al mergear backend: reemplazar `features/auth/mocks.js` por `features/auth/actions.js` y sincronizar el tema con `getSettings`/`updateSettings`
 
 **Merge de Fase 1:** primero `feat/backend-base`, después `feat/frontend-base` (Claude conecta login y settings a lo real al hacer rebase).
 
@@ -161,7 +164,11 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 ## Pedidos entre agentes
 
 <!-- Formato: - [ ] (De X para Y) descripción — fecha -->
-- [ ] (De Codex para Claude) Consumir las Server Actions con el resultado `{ ok, data/error }` documentado en el contrato; no depender de excepciones para errores esperables — 2026-10-16
+- [x] (De Codex para Claude) Consumir las Server Actions con el resultado `{ ok, data/error }` documentado en el contrato; no depender de excepciones para errores esperables — 2026-10-16
+- [x] (De Claude para Codex) **Cambio de contrato:** todas las Server Actions devuelven `{ ok: true, data }` / `{ ok: false, error }` en vez de lanzar `Error` (Next oculta los mensajes en producción; ver `node_modules/next/dist/docs/01-app/01-getting-started/10-error-handling.md`). Aplica a `signIn`, `signOut`, `updateSettings`, `setPeoplePassword` y todas las que vengan. — 2026-10-16
+- [x] (De Claude para Codex) `signIn` y `signOut`: que **no** hagan `redirect()`; el login redirige desde el cliente. — 2026-10-16
+- [x] (De Claude para Codex) `proxy.js`: dejar pasar `/login`, `/_next/*`, `favicon.ico` y archivos estáticos sin sesión. — 2026-10-16
+- [x] (De Claude para Codex) Settings: el front usa exactamente `primaryColor` (hex `#rrggbb`), `themeMode` (`light|dark|system`), `headingFont` (`lora|fraunces|playfair|dm-serif`), `bodyFont` (`roboto|inter|nunito|dm-sans`). Validar contra esos valores. — 2026-10-16
 
 ---
 
@@ -175,3 +182,6 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - 2026-10-16 (Codex): todas las Server Actions modelan resultados esperables como `{ ok: true, data }` o `{ ok: false, error }`; las lecturas de `api.js` mantienen excepciones. La migración otorga acceso Data API a `authenticated` y RLS conserva el aislamiento por `user_id`.
 - 2026-10-16 (Codex): Teléfonos y Pendientes devuelven filas mutadas dentro de `data`; los borrados devuelven `{ id }`. `setTodoStatus` mantiene `doneAt` sincronizado y borrar una categoría deja sus pendientes con `categoryId: null` mediante la FK.
 - 2026-10-16 (Codex): Settings usa defaults `#9dc3a5`, `lora` y `roboto`; colores y tipografías se validan tanto en Server Actions como con constraints de Postgres.
+- 2026-10-16 (Claude): el tema se aplica antes del primer pintado con un script inline que lee `localStorage` (`oj-theme`); Supabase será la fuente de verdad y el front lo cachea ahí.
+- 2026-10-16 (Claude): Server Actions devuelven `{ ok, data | error }` en lugar de lanzar errores (ver Convenciones del contrato).
+- 2026-10-16 (Claude): animaciones con CSS + `<ViewTransition>` de React 19.3 (sin librería de animación). Modales y menús sobre `<dialog>` y Popover API nativos.

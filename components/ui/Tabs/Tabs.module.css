@@ -1,0 +1,63 @@
+.bar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.list {
+  position: relative;
+  display: flex;
+  gap: var(--space-1);
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.tab:hover,
+.tab[data-active="true"] {
+  color: var(--text);
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
+.indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--indicator-w, 0);
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--primary-strong);
+  opacity: var(--indicator-opacity, 0);
+  transform: translateX(var(--indicator-x, 0));
+}
+
+.list[data-indicator-ready] > .indicator {
+  transition:
+    transform var(--dur-slow) var(--ease-out),
+    width var(--dur-slow) var(--ease-out);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: auto;
+  padding-bottom: var(--space-2);
+}
