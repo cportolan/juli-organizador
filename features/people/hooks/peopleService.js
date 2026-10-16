@@ -11,5 +11,6 @@ export {
   savePersonContent,
   setPersonPassword,
   unlockPeopleSection,
-  uploadAttachment,
 } from "@/features/people/actions";
+// Los adjuntos suben directo del navegador a Storage (Vercel corta los requests en 4,5 MB).
+export { uploadAttachmentFile as uploadAttachment } from "@/features/people/uploadAttachmentFile";
