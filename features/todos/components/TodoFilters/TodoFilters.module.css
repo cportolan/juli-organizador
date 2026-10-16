@@ -1,0 +1,28 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.select {
+  width: auto;
+}
+
+.select select {
+  min-height: 34px;
+  padding-block: 5px;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-full);
+  background: transparent;
+}
+
+.select select[data-active="true"] {
+  border-color: var(--primary-strong);
+  background: var(--primary-softer);
+  font-weight: 500;
+}
+
+.clear {
+  animation: fade-in var(--dur) var(--ease-out);
+}

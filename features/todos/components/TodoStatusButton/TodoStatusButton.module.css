@@ -1,0 +1,66 @@
+.button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-spring);
+}
+
+/* Área táctil más grande que el círculo */
+.button::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+.button:hover {
+  border-color: var(--primary-strong);
+}
+
+.button:active {
+  transform: scale(0.88);
+}
+
+.check {
+  width: 12px;
+  height: 12px;
+  color: var(--on-primary);
+  opacity: 0;
+  transform: scale(0.4) rotate(-12deg);
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur) var(--ease-spring);
+}
+
+.button:hover .check {
+  opacity: 0.35;
+  color: var(--primary-strong);
+  transform: scale(0.85);
+}
+
+.button[data-done="true"] {
+  border-color: var(--primary);
+  background: var(--primary);
+  animation: pop var(--dur-slow) var(--ease-spring);
+}
+
+.button[data-done="true"] .check {
+  opacity: 1;
+  color: var(--on-primary);
+  transform: none;
+}
+
+@keyframes pop {
+  40% {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 5px var(--primary-soft);
+  }
+}

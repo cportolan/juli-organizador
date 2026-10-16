@@ -136,7 +136,7 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 
 ### Pendientes
 - [x] Codex: api + actions de todos y categorías
-- [ ] Claude: vistas columnas / tabla / ítems, búsqueda y filtros, modal de creación/edición, CRUD de categorías con color, animaciones al completar
+- [x] Claude: vistas columnas / tabla / ítems, búsqueda y filtros, modal de creación/edición, CRUD de categorías con color, animaciones al completar (branch `feat/todos-ui`)
 
 ### Calendario
 - [x] Codex: api de eventos con expansión de recurrencias (`rrule`), edición/borrado con `scope`, day notes (migración `recurrence_id` revisada y aplicada)
@@ -191,3 +191,4 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - 2026-10-16 (Codex): recurrencias de Calendario admiten `INTERVAL`, `BYDAY`, fin por `UNTIL`, fin por `COUNT` o sin fin. Se evalúan como fechas flotantes de `America/Argentina/Buenos_Aires` y se convierten a instantes ISO al responder; `occurrenceDate` usa la fecha local `YYYY-MM-DD`, independientemente de la zona horaria del servidor.
 - 2026-10-16 (Codex): las excepciones de una serie usan la columna interna `events.recurrence_id` para conservar la fecha original aunque se mueva la ocurrencia. La migración `20261016145525_add_event_recurrence_id.sql` fue revisada y aplicada a Supabase.
 - 2026-10-16 (Claude): patrón de datos en el front: la página compone un `*Loader` (Server Component que llama a `api.js`) dentro de `<Suspense>` con skeleton, y le pasa los datos a un Client Component que mantiene la lista con `useCollection` y llama a las Server Actions con `useMutation` (toast de error y resultado `{ ok }`). Búsqueda sin tildes con `lib/utils/search.js`.
+- 2026-10-16 (Claude): fechas en el front con `lib/utils/dates.js` (date-fns + `@date-fns/tz`), siempre en `America/Argentina/Buenos_Aires` para que servidor y navegador coincidan. Los colores de categorías se eligen de `TONE_SWATCHES` (hex de los tonos pastel) o color libre.

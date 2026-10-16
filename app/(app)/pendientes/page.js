@@ -1,17 +1,16 @@
-import { ListTodo } from "lucide-react";
+import { Suspense } from "react";
 import Page from "@/components/layout/Page/Page";
-import EmptyState from "@/components/ui/EmptyState/EmptyState";
+import TodoBoardLoader from "@/features/todos/components/TodoBoardLoader/TodoBoardLoader";
+import TodoBoardSkeleton from "@/features/todos/components/TodoBoardSkeleton/TodoBoardSkeleton";
 
 export const metadata = { title: "Pendientes" };
 
 export default function TodosPage() {
   return (
     <Page title="Pendientes">
-      <EmptyState
-        icon={ListTodo}
-        title="Los pendientes están en camino"
-        description="Columnas, tabla o lista, con categorías propias, prioridades y filtros."
-      />
+      <Suspense fallback={<TodoBoardSkeleton />}>
+        <TodoBoardLoader />
+      </Suspense>
     </Page>
   );
 }

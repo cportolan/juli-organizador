@@ -1,0 +1,125 @@
+.wrapper {
+  overflow-x: auto;
+  border-top: 1px solid var(--border-strong);
+  animation: rise-in var(--dur-slow) var(--ease-out);
+}
+
+.table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+}
+
+.table th {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-weight: 500;
+}
+
+.table td {
+  padding: var(--space-3);
+  vertical-align: top;
+}
+
+.row {
+  border-top: 1px solid var(--border);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.row:hover {
+  background: var(--primary-softer);
+}
+
+.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-1) 0;
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.sort:hover,
+.sortActive {
+  color: var(--text);
+}
+
+.sortIcon {
+  width: 12px;
+  height: 12px;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.sortActive .sortIcon {
+  opacity: 1;
+}
+
+.statusCell {
+  width: 40px;
+}
+
+.statusCell > * {
+  margin-top: 2px;
+}
+
+.titleCell {
+  min-width: 240px;
+}
+
+.title {
+  text-align: left;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.title:hover {
+  color: var(--primary-strong);
+}
+
+.description {
+  margin-top: 2px;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.categoryCell,
+.priorityCell {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.createdAtCell {
+  width: 1%;
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.actionsCell {
+  width: 1%;
+  text-align: right;
+}
+
+.table td.actionsCell {
+  padding-block: var(--space-2);
+}
+
+.missing {
+  color: var(--text-subtle);
+}
+
+.done .title {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-subtle);
+}

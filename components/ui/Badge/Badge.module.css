@@ -25,7 +25,8 @@
   color: var(--text-muted);
 }
 
-.dot {
+.dot,
+:global([data-theme="dark"]) .dot {
   background: transparent;
   padding-inline: 2px;
   color: var(--text-muted);
