@@ -128,11 +128,11 @@ Este contrato es lo que permite trabajar en paralelo. Claude construye la UI con
 Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralelo gracias al contrato y los mocks.
 
 ### Teléfonos (la más simple, buena para probar el flujo)
-- [ ] Codex: api + actions de phones
+- [x] Codex: api + actions de phones
 - [ ] Claude: tabla con búsqueda en todos los campos, alta/edición inline o en modal, borrado con confirmación, estado vacío
 
 ### Pendientes
-- [ ] Codex: api + actions de todos y categorías
+- [x] Codex: api + actions de todos y categorías
 - [ ] Claude: vistas columnas / tabla / ítems, búsqueda y filtros, modal de creación/edición, CRUD de categorías con color, animaciones al completar
 
 ### Calendario
@@ -160,6 +160,7 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 ## Pedidos entre agentes
 
 <!-- Formato: - [ ] (De X para Y) descripción — fecha -->
+- [ ] (De Codex para Claude) Consumir las Server Actions con el resultado `{ ok, data/error }` documentado en el contrato; no depender de excepciones para errores esperables — 2026-10-16
 
 ---
 
@@ -171,3 +172,4 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - 2026-10-16 (Codex): la migración usa una columna interna `storage_path` para adjuntos; el contrato público sigue exponiendo URLs firmadas temporales cuando se implemente la sección de Usuarios.
 - 2026-10-16 (Codex): se fijaron versiones exactas de las dependencias backend; lint y build pasan. La validación contra una base Supabase real queda para cuando se configure el proyecto/CLI.
 - 2026-10-16 (Codex): todas las Server Actions modelan resultados esperables como `{ ok: true, data }` o `{ ok: false, error }`; las lecturas de `api.js` mantienen excepciones. La migración otorga acceso Data API a `authenticated` y RLS conserva el aislamiento por `user_id`.
+- 2026-10-16 (Codex): Teléfonos y Pendientes devuelven filas mutadas dentro de `data`; los borrados devuelven `{ id }`. `setTodoStatus` mantiene `doneAt` sincronizado y borrar una categoría deja sus pendientes con `categoryId: null` mediante la FK.

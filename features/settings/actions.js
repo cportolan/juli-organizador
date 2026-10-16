@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { getActionContext } from '@/lib/server/actionContext'
 import { actionError, actionSuccess } from '@/lib/server/actionResult'
 import bcrypt from 'bcryptjs'
 
@@ -13,9 +13,9 @@ const FIELD_MAP = {
 }
 
 export async function updateSettings(partialSettings) {
-  const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) return actionError('Necesitás iniciar sesión.')
+  const context = await getActionContext()
+  if (!context.ok) return context.result
+  const { supabase, user } = context
 
   const update = Object.entries(partialSettings ?? {}).reduce((result, [key, value]) => {
     if (FIELD_MAP[key] && value !== undefined) result[FIELD_MAP[key]] = value
@@ -38,10 +38,10 @@ export async function updateSettings(partialSettings) {
   })
 }
 
-export async function setPeoplePassword({ currentPassword, newPassword }) {
-  const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) return actionError('Necesitás iniciar sesión.')
+export async function setPeoplePassword({ currentPassword, newPassword } = {}) {
+  const context = await getActionContext()
+  if (!context.ok) return context.result
+  const { supabase, user } = context
   if (newPassword !== null && typeof newPassword !== 'string') return actionError('La nueva contraseña no es válida.')
   if (newPassword !== null && newPassword.length < 8) return actionError('La contraseña debe tener al menos 8 caracteres.')
 

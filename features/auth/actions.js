@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { actionError, actionSuccess } from '@/lib/server/actionResult'
 
-export async function signIn({ email, password }) {
+export async function signIn({ email, password } = {}) {
   if (!email || !password) {
     return actionError('Completá tu email y contraseña.')
   }
