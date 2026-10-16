@@ -8,7 +8,10 @@ export async function getEvents({ from, to } = {}) {
 
   const supabase = await createClient()
   await requireUser(supabase)
+  const rangeStart = new Date(from).toISOString()
+  const rangeEnd = new Date(to).toISOString()
   const { data, error } = await supabase.from('events').select(EVENT_COLUMNS)
+    .or(`rrule.not.is.null,series_id.not.is.null,and(start_at.lt.${rangeEnd},end_at.gte.${rangeStart})`)
   if (error) throw new Error('No se pudieron cargar los eventos.')
 
   return data
@@ -37,6 +40,16 @@ export async function getDayNote(date) {
     createdAt: data.created_at,
     updatedAt: data.updated_at,
   }
+}
+
+export async function getDayNotes({ from, to } = {}) {
+  if (!isDateOnly(from) || !isDateOnly(to) || from > to) throw new Error('El rango de fechas no es válido.')
+  const supabase = await createClient()
+  await requireUser(supabase)
+  const { data, error } = await supabase.from('day_notes').select('date')
+    .gte('date', from).lte('date', to).order('date')
+  if (error) throw new Error('No se pudieron cargar las notas del día.')
+  return data
 }
 
 async function requireUser(supabase) {

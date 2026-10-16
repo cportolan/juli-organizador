@@ -2,14 +2,15 @@
 
 import { getActionContext } from '@/lib/server/actionContext'
 import { actionError, actionSuccess } from '@/lib/server/actionResult'
-import bcrypt from 'bcryptjs'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { checkPassword, hashPassword } from '@/lib/server/people/access'
+import { peopleAction } from '@/lib/server/people/action'
 
 const FIELD_MAP = {
   primaryColor: 'primary_color',
   themeMode: 'theme_mode',
   headingFont: 'heading_font',
   bodyFont: 'body_font',
-  peopleLockEnabled: 'people_lock_enabled',
 }
 
 const THEME_MODES = new Set(['light', 'dark', 'system'])
@@ -31,7 +32,12 @@ export async function updateSettings(partialSettings) {
   }, {})
   if (!Object.keys(update).length) return actionError('No hay cambios para guardar.')
 
-  const { data, error } = await supabase.from('settings').upsert({ user_id: user.id, ...update }, { onConflict: 'user_id' }).select('id, primary_color, theme_mode, heading_font, body_font, people_lock_enabled, created_at, updated_at').single()
+  const { data: existing, error: readError } = await supabase.from('settings').select('id').eq('user_id', user.id).maybeSingle()
+  if (readError) return actionError('No se pudo cargar la configuración.')
+  const query = existing
+    ? supabase.from('settings').update(update).eq('user_id', user.id)
+    : supabase.from('settings').insert({ user_id: user.id, ...update })
+  const { data, error } = await query.select('id, primary_color, theme_mode, heading_font, body_font, people_lock_enabled, created_at, updated_at').single()
   if (error) return actionError('No se pudo guardar la configuración.')
 
   return actionSuccess({
@@ -62,35 +68,28 @@ function validateSettings(settings) {
   if (Object.hasOwn(settings, 'bodyFont') && !BODY_FONTS.has(settings.bodyFont)) {
     return 'La tipografía de texto no es válida.'
   }
-  if (Object.hasOwn(settings, 'peopleLockEnabled') && typeof settings.peopleLockEnabled !== 'boolean') {
-    return 'La configuración de bloqueo no es válida.'
-  }
+  if (Object.hasOwn(settings, 'peopleLockEnabled')) return 'Usá la contraseña de Usuarios para cambiar el bloqueo.'
   return null
 }
 
 export async function setPeoplePassword({ currentPassword, newPassword } = {}) {
-  const context = await getActionContext()
-  if (!context.ok) return context.result
-  const { supabase, user } = context
-  if (newPassword !== null && typeof newPassword !== 'string') return actionError('La nueva contraseña no es válida.')
-  if (newPassword !== null && newPassword.length < 8) return actionError('La contraseña debe tener al menos 8 caracteres.')
-
-  const { data: settings, error: readError } = await supabase.from('settings').select('people_password_hash').eq('user_id', user.id).maybeSingle()
-  if (readError) return actionError('No se pudo verificar la contraseña de Usuarios.')
-  if (settings?.people_password_hash) {
-    const valid = await bcrypt.compare(currentPassword ?? '', settings.people_password_hash)
-    if (!valid) return actionError('La contraseña actual no es correcta.')
-  } else if (currentPassword) {
-    return actionError('No hay una contraseña de Usuarios configurada.')
-  }
-
-  const passwordHash = newPassword === null ? null : await bcrypt.hash(newPassword, 12)
-  const { error } = await supabase.from('settings').upsert({
-    user_id: user.id,
-    people_password_hash: passwordHash,
-    people_lock_enabled: passwordHash !== null,
-  }, { onConflict: 'user_id' })
-  if (error) return actionError('No se pudo guardar la contraseña de Usuarios.')
-
-  return actionSuccess({ peopleLockEnabled: passwordHash !== null })
+  return peopleAction(async () => {
+    const context = await getActionContext()
+    if (!context.ok) return context.result
+    const { user } = context
+    const admin = createAdminClient()
+    const { data: settings, error: readError } = await admin.from('settings').select('people_password_hash').eq('user_id', user.id).maybeSingle()
+    if (readError) return actionError('No se pudo verificar la contraseña de Usuarios.')
+    if (settings?.people_password_hash) {
+      if (!await checkPassword(currentPassword, settings.people_password_hash)) return actionError('La contraseña actual no es correcta.')
+    } else if (currentPassword) {
+      return actionError('No hay una contraseña de Usuarios configurada.')
+    }
+    const passwordHash = newPassword === null ? null : await hashPassword(newPassword)
+    const { error } = await admin.from('settings').upsert({
+      user_id: user.id, people_password_hash: passwordHash, people_lock_enabled: passwordHash !== null,
+    }, { onConflict: 'user_id' })
+    if (error) return actionError('No se pudo guardar la contraseña de Usuarios.')
+    return actionSuccess({ peopleLockEnabled: passwordHash !== null })
+  })
 }

@@ -90,11 +90,11 @@ Este contrato es lo que permite trabajar en paralelo. Claude construye la UI con
 - `getPeople()` → lista sin `content`
 - `unlockPeopleSection(password)` → setea cookie httpOnly firmada de corta duración
 - `isPeopleSectionUnlocked()`
-- `getPerson(id, { password })` → con `content` (verifica sección y contraseña de la ficha en el servidor)
+- `getPerson({ id, password })` → Server Action, `{ ok, data }` con `content` (verifica sección y contraseña de la ficha en el servidor)
 - `createPerson({ name })`, `renamePerson({ id, name })`, `reorderPeople(ids)`, `deletePerson(id)`
 - `savePersonContent({ id, content })`
 - `setPersonPassword({ id, currentPassword, newPassword })`
-- `getAttachments(personId)`, `uploadAttachment({ personId, title, file })` (recibe `FormData`), `renameAttachment({ id, title })`, `deleteAttachment(id)`
+- `getAttachments(personId)`, `uploadAttachment(formData)` (recibe `FormData`), `renameAttachment({ id, title })`, `deleteAttachment(id)`
 
 ---
 
@@ -144,8 +144,8 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - [x] Claude: instalar Tiptap (se reutiliza en Usuarios y en el anotador del día) — componente único `components/ui/RichTextEditor` (branch `feat/rich-text-editor`)
 
 ### Usuarios (fichas)
-- [ ] Codex: api + actions de people, contraseñas hasheadas, cookie de desbloqueo, upload/descarga de adjuntos con signed URLs
-- [ ] Codex: impedir que `people.content`, `people.password_hash` y `settings.people_password_hash` sean legibles por `authenticated` desde la Data API; el contenido bloqueado solo puede salir por funciones de servidor que verifiquen la contraseña
+- [x] Codex: api + actions de people, contraseñas hasheadas, cookie de desbloqueo, upload/descarga de adjuntos con signed URLs
+- [x] Codex: impedir que `people.content`, `people.password_hash` y `settings.people_password_hash` sean legibles por `authenticated` desde la Data API; el contenido bloqueado solo puede salir por funciones de servidor que verifiquen la contraseña
 - [x] Claude: pantalla de contraseña de la sección, pestañas (crear, renombrar, reordenar, borrar), bloqueo por pestaña, editor Tiptap con autoguardado, lista de adjuntos con preview de imágenes/PDF (branch `feat/people-ui`, **contra mocks**)
 - [ ] Claude: cuando estén las actions de people, cambiar el import de `features/people/hooks/peopleService.js` y el de `PeopleLoader` (hoy `mocksServer.js`) por `actions.js` / `api.js`, y borrar `mocks.js` y `mocksServer.js`
 
@@ -172,15 +172,15 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - [x] (De Claude para Codex) Settings: el front usa exactamente `primaryColor` (hex `#rrggbb`), `themeMode` (`light|dark|system`), `headingFont` (`lora|fraunces|playfair|dm-serif`), `bodyFont` (`roboto|inter|nunito|dm-sans`). Validar contra esos valores. — 2026-10-16
 - [x] (De Claude para Codex) **Zona horaria en recurrencias:** hoy se expanden en UTC y `occurrenceDate` es la fecha UTC. Un evento semanal "lunes 22:00" en Argentina (UTC-3) cae martes 01:00 UTC, así que `BYDAY` y `occurrenceDate` quedan corridos un día, y lo mismo con los eventos de todo el día. Expandir con la zona `America/Argentina/Buenos_Aires` (`tzid` de rrule o equivalente) y que `occurrenceDate` sea la fecha local. — 2026-10-16
 - [x] (De Claude para Codex) **Migraciones:** no editar migraciones que ya están aplicadas; cada cambio va en una migración nueva. En el merge saqué `recurrence_id` de `20261016000000_initial_schema.sql` porque `20261016145525_add_event_recurrence_id.sql` la agrega de nuevo y en una base vacía fallaría. — 2026-10-16
-- [ ] (De Claude para Codex) **Revisar:** toqué `features/calendar/recurrence.js` (archivo tuyo) porque rompía el build: `import rrule from 'rrule'` no existe en el ESM que usa el bundler de Next. Quedó `import * as rruleModule` tomando `RRule` del export con nombre o de `default` (Node). `recurrence.test.mjs` sigue pasando. Si preferís otra solución, cambialo. — 2026-10-16
-- [ ] (De Claude para Codex) Opcional: `getDayNotes({ from, to })` → `[{ date }]` (solo fechas con nota) para marcar en el calendario los días que tienen nota. — 2026-10-16
-- [ ] (De Claude para Codex) **Usuarios — ajustes al contrato** (la UI ya está hecha contra `features/people/mocks.js`, que tiene exactamente las firmas que uso):
+- [x] (De Claude para Codex) **Revisar:** toqué `features/calendar/recurrence.js` (archivo tuyo) porque rompía el build: `import rrule from 'rrule'` no existe en el ESM que usa el bundler de Next. Quedó `import * as rruleModule` tomando `RRule` del export con nombre o de `default` (Node). `recurrence.test.mjs` sigue pasando. Si preferís otra solución, cambialo. — 2026-10-16
+- [x] (De Claude para Codex) Opcional: `getDayNotes({ from, to })` → `[{ date }]` (solo fechas con nota) para marcar en el calendario los días que tienen nota. — 2026-10-16
+- [x] (De Claude para Codex) **Usuarios — ajustes al contrato** (la UI ya está hecha contra `features/people/mocks.js`, que tiene exactamente las firmas que uso):
   - `getPerson({ id, password })` y `getAttachments(personId)` se llaman **desde el cliente** (al desbloquear una ficha o cambiar de pestaña), así que tienen que ser Server Actions en `actions.js` y devolver `{ ok, data }`. Errores esperados: `"Esta ficha tiene contraseña."` (sin password) y `"La contraseña de la ficha no es correcta."`.
   - `unlockPeopleSection(password)` → `{ ok, data }` (después la UI hace `router.refresh()` y el servidor lee `isPeopleSectionUnlocked()`).
   - `uploadAttachment(formData)` recibe `personId`, `title` y `file` en el `FormData`. El front limita a 10 MB; validar también tamaño y tipo en el servidor (y el límite de body de Server Actions en `next.config.js`, que por defecto es 1 MB — revisar `serverActions.bodySizeLimit`).
   - `setPersonPassword` → `{ ok, data: { hasPassword } }`. `savePersonContent` → `{ ok, data }`. `reorderPeople(ids)` → `{ ok }`.
   — 2026-10-16
-- [ ] (De Claude para Codex) `getEvents` trae todos los eventos y filtra en memoria. Por ahora sirve; más adelante filtrar en la consulta los eventos sin repetición que no tocan el rango. — 2026-10-16
+- [x] (De Claude para Codex) `getEvents` trae todos los eventos y filtra en memoria. Por ahora sirve; más adelante filtrar en la consulta los eventos sin repetición que no tocan el rango. — 2026-10-16
 
 ---
 
@@ -204,3 +204,11 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - 2026-10-16 (Claude): Tiptap 3.31.3 con versiones exactas (todas las `@tiptap/*` tienen que coincidir). Los colores de texto y resaltado se guardan en el JSON como `var(--ink-*)` / `var(--mark-*)`, así se adaptan al modo oscuro. Autoguardado con `lib/hooks/useAutosave.js` + `components/ui/SaveStatus`.
 - 2026-10-16 (Claude): Calendario: vista, días y fecha viven en la URL (`/calendario?vista=semana&dias=7&fecha=YYYY-MM-DD`); el servidor carga el rango y después de cada mutación se hace `router.refresh()`. Eventos de día completo: `startAt` = medianoche del primer día y `endAt` = medianoche del día siguiente al último (fin exclusivo), en hora de Argentina. Al editar "todos" desde una repetición, el front manda solo los campos cambiados y corre el DTSTART de la serie lo mismo que se movió la repetición.
 - 2026-10-16 (Claude): Usuarios: la pestaña elegida se recuerda en el navegador (`oj-people-active`). Las fichas con contraseña se vuelven a bloquear al cambiar de pestaña; la contraseña nunca se guarda en el cliente. Si la sección está bloqueada, el servidor no manda ni los nombres de las fichas.
+
+- 2026-10-16 (Codex, `feat/people-backend`): Usuarios implementado con las firmas de mocks; `getPerson` y `getAttachments` son Server Actions, `getPeople` solo devuelve id/nombre/posición/hasPassword. `reorderPeople` usa RPC atómica exclusiva de service_role y valida el conjunto completo.
+- 2026-10-16 (Codex, `feat/people-backend`): bcrypt costo 12; cookies firmadas HMAC-SHA256 de 30 minutos, httpOnly/SameSite=Strict/Secure en producción, ligadas a usuario/sesión/versiones de contraseñas. Una cookie de ficha activa; cargar fichas protegidas exige contraseña explícita. Cambiar contraseñas invalida permisos anteriores.
+- 2026-10-16 (Codex, `feat/people-backend`): nueva migración revoca acceso cliente a people/adjuntos y hashes de settings; Storage queda exclusivo del servidor con política restrictiva. Se requieren `SUPABASE_SECRET_KEY` y `PEOPLE_COOKIE_SECRET` privadas, documentadas en `.env.example` y `supabase/README.md`. `updateSettings` mantiene preferencias visuales; bloqueo/contraseña se cambian exclusivamente mediante `setPeoplePassword`.
+- 2026-10-16 (Codex, `feat/people-backend`): adjuntos de hasta 10 MiB con MIME/firma/extensión verificados (PDF, imágenes raster, ZIP, Office OpenXML, TXT/CSV UTF-8); body de Server Actions 11 MiB. Signed URLs duran 5 minutos; URLs ya emitidas vencen naturalmente. Storage/metadata requieren reintentar borrados ante fallas parciales.
+- 2026-10-16 (Codex, `feat/people-backend`): se conserva el import interoperable de rrule de Claude; tests de recurrencia y build pasan. Implementados getDayNotes (fechas guardadas, rango inclusivo) y filtrado SQL de eventos simples fuera de rango.
+- 2026-10-16 (Codex, `feat/people-backend`): lint, pruebas de cookies/archivos/acciones (transporte simulado), migraciones desde cero y pruebas SQL de permisos/reordenamiento en PostgreSQL 17 aislado pasan. Build con variables públicas de prueba (worktree sin .env.local). Migración todavía no aplicada al proyecto remoto y upload/descarga real pendientes de configuración; ningún archivo de frontend editado. Claude ya puede conectar peopleService y PeopleLoader y retirar mocks después de configurar variables/aplicar migración.
+- 2026-10-16 (Codex, `feat/people-backend`): migración `20261016175634_secure_people_server_access.sql` aplicada a `juli-organizador` (`kfohgkbewwwacxbyuoun`) vía API de administración, con SQL e historial en una misma transacción (conexión directa de CLI sin respuesta). Verificado en remoto: versión registrada, contenido/hashes inaccesibles para authenticated, política restrictiva de Storage activa y preferencias visuales editables. Advisor de seguridad solo informa el aviso previo de protección de contraseñas filtradas de Auth deshabilitada. Queda configurar las dos variables privadas y conectar/desplegar el backend para usar Usuarios reales.
