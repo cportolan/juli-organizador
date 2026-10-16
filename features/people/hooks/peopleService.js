@@ -1,5 +1,4 @@
-// Único punto de acceso de la UI de Usuarios a los datos. Hoy apunta a los
-// mocks; cuando Codex publique features/people/actions.js se cambia este import.
+// Único punto de acceso de la UI de Usuarios a las Server Actions de people.
 export {
   createPerson,
   deleteAttachment,
@@ -13,4 +12,4 @@ export {
   setPersonPassword,
   unlockPeopleSection,
   uploadAttachment,
-} from "@/features/people/mocks";
+} from "@/features/people/actions";

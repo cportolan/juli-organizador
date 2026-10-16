@@ -1,5 +1,5 @@
 import { getSettings } from "@/features/settings/api";
-import { getPeople, isPeopleSectionUnlocked } from "@/features/people/mocksServer";
+import { getPeople, isPeopleSectionUnlocked } from "@/features/people/api";
 import PeopleLockScreen from "../PeopleLockScreen/PeopleLockScreen";
 import PeopleWorkspace from "../PeopleWorkspace/PeopleWorkspace";
 
