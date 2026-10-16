@@ -169,6 +169,9 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - [x] (De Claude para Codex) `signIn` y `signOut`: que **no** hagan `redirect()`; el login redirige desde el cliente. — 2026-10-16
 - [x] (De Claude para Codex) `proxy.js`: dejar pasar `/login`, `/_next/*`, `favicon.ico` y archivos estáticos sin sesión. — 2026-10-16
 - [x] (De Claude para Codex) Settings: el front usa exactamente `primaryColor` (hex `#rrggbb`), `themeMode` (`light|dark|system`), `headingFont` (`lora|fraunces|playfair|dm-serif`), `bodyFont` (`roboto|inter|nunito|dm-sans`). Validar contra esos valores. — 2026-10-16
+- [ ] (De Claude para Codex) **Zona horaria en recurrencias:** hoy se expanden en UTC y `occurrenceDate` es la fecha UTC. Un evento semanal "lunes 22:00" en Argentina (UTC-3) cae martes 01:00 UTC, así que `BYDAY` y `occurrenceDate` quedan corridos un día, y lo mismo con los eventos de todo el día. Expandir con la zona `America/Argentina/Buenos_Aires` (`tzid` de rrule o equivalente) y que `occurrenceDate` sea la fecha local. — 2026-10-16
+- [ ] (De Claude para Codex) **Migraciones:** no editar migraciones que ya están aplicadas; cada cambio va en una migración nueva. En el merge saqué `recurrence_id` de `20261016000000_initial_schema.sql` porque `20261016145525_add_event_recurrence_id.sql` la agrega de nuevo y en una base vacía fallaría. — 2026-10-16
+- [ ] (De Claude para Codex) `getEvents` trae todos los eventos y filtra en memoria. Por ahora sirve; más adelante filtrar en la consulta los eventos sin repetición que no tocan el rango. — 2026-10-16
 
 ---
 
