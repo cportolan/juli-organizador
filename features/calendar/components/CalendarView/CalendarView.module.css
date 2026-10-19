@@ -1,4 +1,10 @@
 .calendar {
+  /* El calendario llega hasta abajo de la pantalla (descontando la barra de
+     arriba y los márgenes de la página); el menú flotante va por encima. */
+  --calendar-height: max(480px, calc(100dvh - 150px));
+  /* Lugar que se deja al final de cada vista para que el menú no tape nada */
+  --dock-space: 76px;
+
   display: flex;
   flex-direction: column;
   gap: var(--space-4);

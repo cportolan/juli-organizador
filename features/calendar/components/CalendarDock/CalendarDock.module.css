@@ -1,0 +1,72 @@
+/*
+ * Flota por encima del calendario, abajo y centrado en su columna. El dock
+ * no ocupa alto (el calendario llega hasta abajo); es sticky, así que si la
+ * página scrollea queda pegado al borde inferior de la pantalla.
+ */
+.dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  height: 0;
+  margin-top: calc(var(--space-4) * -1);
+  pointer-events: none;
+}
+
+.bar {
+  position: absolute;
+  bottom: var(--space-4);
+  left: 50%;
+  translate: -50% 0;
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+  padding: 6px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  pointer-events: auto;
+  scrollbar-width: none;
+  animation: dock-in var(--dur-slow) var(--ease-out);
+}
+
+.bar > * {
+  flex-shrink: 0;
+}
+
+.divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+}
+
+@keyframes dock-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Con el botón flotante del panel derecho (pantallas angostas), dejarle lugar */
+@media (max-width: 1100px) {
+  .bar {
+    max-width: calc(100% - 136px);
+  }
+}
+
+@media (max-width: 640px) {
+  .bar {
+    left: 0;
+    translate: none;
+    max-width: calc(100% - 68px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+  }
+}

@@ -1,9 +1,10 @@
 .columns {
   display: grid;
-  grid-template-columns: repeat(var(--days), minmax(150px, 1fr));
+  grid-template-columns: repeat(var(--days), minmax(120px, 1fr));
   gap: var(--space-2);
-  min-height: max(420px, calc(100dvh - 220px));
+  min-height: var(--calendar-height);
   padding-top: var(--space-2);
+  padding-bottom: var(--dock-space);
   border-top: 1px solid var(--border-strong);
   overflow-x: auto;
   overscroll-behavior-x: contain;

@@ -1,7 +1,8 @@
 .month {
   display: flex;
   flex-direction: column;
-  height: max(560px, calc(100dvh - 200px));
+  height: var(--calendar-height);
+  padding-bottom: var(--dock-space);
 }
 
 .weekdays {

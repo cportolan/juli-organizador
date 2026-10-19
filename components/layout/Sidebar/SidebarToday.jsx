@@ -20,14 +20,23 @@ export default function SidebarToday({ collapsed }) {
   }
 
   const date = parseISO(today);
+  const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 
+  if (collapsed) {
+    return (
+      <time dateTime={today} className={styles.today}>
+        <span className={styles.todayWeekday}>{format(date, "EEEEEE", { locale: es })}</span>
+        <span className={styles.todayDay}>{format(date, "d")}</span>
+      </time>
+    );
+  }
+
+  // "Lunes / de Octubre" a la izquierda y el número del alto de las dos líneas.
   return (
     <time dateTime={today} className={styles.today}>
-      <span className={styles.todayWeekday}>{format(date, collapsed ? "EEEEEE" : "EEEE", { locale: es })}</span>
-      <span className={styles.todayDate}>
-        <span className={styles.todayDay}>{format(date, "d")}</span>
-        <span className={styles.todayMonth}>{format(date, collapsed ? "MMM" : "'de' MMMM", { locale: es })}</span>
-      </span>
+      <span className={styles.todayWeekday}>{capitalize(format(date, "EEEE", { locale: es }))}</span>
+      <span className={styles.todayMonth}>de {capitalize(format(date, "MMMM", { locale: es }))}</span>
+      <span className={styles.todayDay}>{format(date, "d")}</span>
     </time>
   );
 }

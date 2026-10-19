@@ -13,7 +13,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  height: max(520px, calc(100dvh - 200px));
+  height: max(480px, calc(100dvh - 150px));
   margin-left: 56px;
   border-top: 1px solid var(--border-strong);
 }

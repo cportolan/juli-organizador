@@ -8,6 +8,7 @@ import { useStoredState } from "@/lib/hooks/useStoredState";
 import { useCalendarNavigation } from "../../hooks/useCalendarNavigation";
 import { useEventEditor } from "../../hooks/useEventEditor";
 import CalendarToolbar from "../CalendarToolbar/CalendarToolbar";
+import CalendarDock from "../CalendarDock/CalendarDock";
 import MonthView from "../MonthView/MonthView";
 import TimeGrid from "../TimeGrid/TimeGrid";
 import AgendaColumns from "../AgendaColumns/AgendaColumns";
@@ -80,17 +81,11 @@ export default function CalendarView({ state, today, days, events, holidays = []
   return (
     <div className={styles.calendar}>
       <CalendarToolbar
-        state={state}
         label={label}
         pending={nav.pending}
         isCurrent={isCurrent}
-        layout={layout}
-        onLayout={setLayout}
         onToday={() => nav.go({ date: today })}
         onStep={(direction) => nav.go({ date: stepDate(state, direction) })}
-        onView={(view) => nav.go({ view })}
-        onDays={(count) => nav.go({ view: "semana", days: count })}
-        onNew={createNew}
       />
 
       <div key={`${state.view}:${layout}:${days[0]}:${days.length}`} className={cx(styles.view, nav.pending && styles.pending)}>
@@ -102,6 +97,15 @@ export default function CalendarView({ state, today, days, events, holidays = []
           <TimeGrid {...viewProps} />
         )}
       </div>
+
+      <CalendarDock
+        state={state}
+        layout={layout}
+        onView={(view) => nav.go({ view })}
+        onLayout={setLayout}
+        onDays={(count) => nav.go({ view: "semana", days: count })}
+        onNew={createNew}
+      />
 
       <EventFormModal
         editing={editor.editing}
