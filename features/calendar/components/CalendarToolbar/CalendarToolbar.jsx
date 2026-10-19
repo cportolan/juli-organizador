@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, LoaderCircle, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock3, LayoutList, LoaderCircle, Plus } from "lucide-react";
 import Button from "@/components/ui/Button/Button";
 import IconButton from "@/components/ui/IconButton/IconButton";
 import SegmentedControl from "@/components/ui/SegmentedControl/SegmentedControl";
@@ -18,8 +18,26 @@ const DAY_ITEMS = [
   { id: 3, label: "3 días" },
 ];
 
+/** Semana y día: grilla con horarios (se arrastra para crear) o tarjetas por día. */
+export const LAYOUT_ITEMS = [
+  { id: "horas", label: "Con horarios", icon: Clock3 },
+  { id: "tarjetas", label: "Tarjetas", icon: LayoutList },
+];
+
 /** Navegación del calendario: hoy, anterior/siguiente, período y vista. */
-export default function CalendarToolbar({ state, label, pending, isCurrent, onToday, onStep, onView, onDays, onNew }) {
+export default function CalendarToolbar({
+  state,
+  label,
+  pending,
+  isCurrent,
+  layout,
+  onToday,
+  onStep,
+  onView,
+  onDays,
+  onLayout,
+  onNew,
+}) {
   return (
     <div className={styles.toolbar}>
       <div className={styles.nav}>
@@ -35,6 +53,9 @@ export default function CalendarToolbar({ state, label, pending, isCurrent, onTo
       </h2>
       <div className={styles.views}>
         <SegmentedControl label="Vista" items={VIEW_ITEMS} value={state.view} onChange={onView} size="sm" />
+        {state.view !== "mes" && (
+          <SegmentedControl label="Mostrar" items={LAYOUT_ITEMS} value={layout} onChange={onLayout} size="sm" iconOnly />
+        )}
         {state.view === "semana" && (
           <SegmentedControl label="Días visibles" items={DAY_ITEMS} value={state.days} onChange={onDays} size="sm" />
         )}

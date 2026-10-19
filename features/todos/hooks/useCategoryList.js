@@ -4,8 +4,7 @@ import { useCallback, useMemo } from "react";
 import { useCollection } from "@/lib/hooks/useCollection";
 import { useMutation } from "@/lib/hooks/useMutation";
 import { createCategory, deleteCategory, updateCategory } from "@/features/todos/actions";
-
-const collator = new Intl.Collator("es", { sensitivity: "base" });
+import { sortCategories } from "../components/todoMeta";
 
 /** Categorías de pendientes, ordenadas por nombre, con su CRUD. */
 export function useCategoryList(initialCategories) {
@@ -15,10 +14,7 @@ export function useCategoryList(initialCategories) {
   const [runDelete] = useMutation(deleteCategory, { successMessage: "Categoría borrada" });
   const { upsert, remove } = categories;
 
-  const sorted = useMemo(
-    () => categories.items.toSorted((a, b) => collator.compare(a.name, b.name)),
-    [categories.items],
-  );
+  const sorted = useMemo(() => sortCategories(categories.items), [categories.items]);
   const byId = useMemo(() => new Map(categories.items.map((category) => [category.id, category])), [categories.items]);
 
   const create = useCallback(

@@ -52,9 +52,8 @@ Nunca usar ni pedir la secret key de Supabase en el frontend. Toda tabla lleva *
 #### Calendario / Agenda
 - Cambio de vista: mensual, semanal (7, 5 o 3 días) y diaria.
 - Vista moderna estilo Google Calendar.
-- To-do flotante a la derecha (sidebar derecho) con **los mismos datos que Pendientes**; con flechas debajo de cada ítem se cambia el estado (**Pendiente ↔ Realizado**).
+- To-do flotante a la derecha (sidebar derecho) con **los mismos datos que Pendientes**, de a **una categoría por vez**: las flechas del encabezado pasan a la categoría anterior o siguiente, y cada ítem tiene su check para marcarlo realizado. Lo que se anota ahí va a la categoría visible.
 - Anotar eventos, cumpleaños y reuniones. Los eventos pueden repetirse o no, **estilo Google Calendar**: no se repite, diario, semanal (eligiendo días), mensual, anual y personalizado (cada N días/semanas/meses/años, con fin: nunca, en una fecha o después de N repeticiones). Al editar o borrar uno que se repite, preguntar: "solo este", "este y los siguientes" o "todos".
-- Anotador general por día (una nota libre por día, aparte de los eventos): lo que se hizo en el día o notas libres.
 
 #### Teléfonos / Internos
 - Barra de búsqueda que busca en todos los campos.

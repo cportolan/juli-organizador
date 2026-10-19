@@ -4,11 +4,13 @@ import { useEffect, useMemo } from "react";
 import { cx } from "@/lib/utils/cx";
 import { addDaysToKey, combineDateTime, dayStartIso, minutesToTime, periodLabel, stepDate } from "@/lib/utils/calendar";
 import { useNow } from "@/lib/hooks/useNow";
+import { useStoredState } from "@/lib/hooks/useStoredState";
 import { useCalendarNavigation } from "../../hooks/useCalendarNavigation";
 import { useEventEditor } from "../../hooks/useEventEditor";
 import CalendarToolbar from "../CalendarToolbar/CalendarToolbar";
 import MonthView from "../MonthView/MonthView";
 import TimeGrid from "../TimeGrid/TimeGrid";
+import AgendaColumns from "../AgendaColumns/AgendaColumns";
 import EventFormModal from "../EventFormModal/EventFormModal";
 import ScopeDialog from "../ScopeDialog/ScopeDialog";
 import styles from "./CalendarView.module.css";
@@ -22,6 +24,7 @@ export default function CalendarView({ state, today, days, events, holidays = []
   const nav = useCalendarNavigation(state);
   const editor = useEventEditor({ onDone: nav.refresh });
   const now = useNow();
+  const [layout, setLayout] = useStoredState("oj-calendar-layout", "tarjetas");
   const label = useMemo(() => {
     const text = periodLabel(state, days);
     return text.charAt(0).toUpperCase() + text.slice(1);
@@ -81,6 +84,8 @@ export default function CalendarView({ state, today, days, events, holidays = []
         label={label}
         pending={nav.pending}
         isCurrent={isCurrent}
+        layout={layout}
+        onLayout={setLayout}
         onToday={() => nav.go({ date: today })}
         onStep={(direction) => nav.go({ date: stepDate(state, direction) })}
         onView={(view) => nav.go({ view })}
@@ -88,9 +93,11 @@ export default function CalendarView({ state, today, days, events, holidays = []
         onNew={createNew}
       />
 
-      <div key={`${state.view}:${days[0]}:${days.length}`} className={cx(styles.view, nav.pending && styles.pending)}>
+      <div key={`${state.view}:${layout}:${days[0]}:${days.length}`} className={cx(styles.view, nav.pending && styles.pending)}>
         {state.view === "mes" ? (
           <MonthView {...viewProps} month={state.date.slice(0, 7)} />
+        ) : layout === "tarjetas" ? (
+          <AgendaColumns {...viewProps} />
         ) : (
           <TimeGrid {...viewProps} />
         )}

@@ -14,7 +14,7 @@ export default function CalendarPage({ searchParams }) {
       wide
       aside={
         <Suspense fallback={<CalendarAsideSkeleton />}>
-          <CalendarAsideLoader searchParams={searchParams} />
+          <CalendarAsideLoader />
         </Suspense>
       }
     >

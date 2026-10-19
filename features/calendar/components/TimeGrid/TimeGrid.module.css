@@ -20,55 +20,6 @@
   padding-block: var(--space-2);
 }
 
-.dayHead {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: var(--space-1) 0;
-  border-radius: var(--radius-sm);
-  transition: background-color var(--dur-fast) var(--ease-out);
-}
-
-.dayHead:hover {
-  background: var(--surface-2);
-}
-
-.weekday {
-  font-size: var(--text-xs);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-subtle);
-}
-
-.dayNumber {
-  display: grid;
-  place-items: center;
-  min-width: 36px;
-  height: 36px;
-  padding-inline: 6px;
-  border-radius: var(--radius-full);
-  font-family: var(--font-heading);
-  font-size: var(--text-lg);
-  transition:
-    background-color var(--dur) var(--ease-out),
-    color var(--dur) var(--ease-out);
-}
-
-.isSelected .dayNumber {
-  background: var(--surface-3);
-}
-
-.isToday .weekday {
-  color: var(--primary-strong);
-  font-weight: 600;
-}
-
-.isToday .dayNumber {
-  background: var(--primary);
-  color: var(--on-primary);
-}
-
 .allDay {
   border-bottom: 1px solid var(--border);
   min-height: 12px;
@@ -135,20 +86,9 @@
     --gutter: 44px;
     --hour: 48px;
   }
-
-  .dayNumber {
-    min-width: 30px;
-    height: 30px;
-    font-size: var(--text-md);
-  }
 }
 
 /* Feriados (ArgentinaDatos) */
-.isHoliday .weekday,
-.isHoliday:not(.isToday) .dayNumber {
-  color: var(--ink-rose);
-}
-
 .holiday {
   display: block;
   padding: 1px var(--space-2);

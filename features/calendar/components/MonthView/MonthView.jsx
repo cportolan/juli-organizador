@@ -3,21 +3,16 @@
 import { useMemo } from "react";
 import { cx } from "@/lib/utils/cx";
 import { formatDate } from "@/lib/utils/dates";
-import { eventsOnDay, isAllDayLike, keyToDate, occurrenceKey } from "@/lib/utils/calendar";
+import { eventsOnDay, keyToDate, occurrenceKey, sortDayEvents } from "@/lib/utils/calendar";
 import EventChip from "../EventChip/EventChip";
 import styles from "./MonthView.module.css";
 
 const WEEKDAY_LABELS = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"];
 const MAX_VISIBLE = 3;
 
-function sortForDay(events) {
-  // Primero los de todo el día, después por hora.
-  return events.toSorted((a, b) => Number(isAllDayLike(b)) - Number(isAllDayLike(a)) || a.startAt.localeCompare(b.startAt));
-}
-
 /** Vista mensual: semanas de lunes a domingo. */
 export default function MonthView({ days, month, events, holidays, today, selectedDate, onCreate, onOpen, onDayClick }) {
-  const byDay = useMemo(() => days.map((day) => sortForDay(eventsOnDay(events, day))), [days, events]);
+  const byDay = useMemo(() => days.map((day) => sortDayEvents(eventsOnDay(events, day))), [days, events]);
 
   return (
     <div className={styles.month}>

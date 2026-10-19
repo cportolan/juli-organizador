@@ -2,10 +2,11 @@
 
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { cx } from "@/lib/utils/cx";
-import { formatDate, toDateKey } from "@/lib/utils/dates";
-import { eventsOnDay, isAllDayLike, keyToDate, layoutDayEvents, minutesOfDay, occurrenceKey } from "@/lib/utils/calendar";
+import { toDateKey } from "@/lib/utils/dates";
+import { eventsOnDay, isAllDayLike, layoutDayEvents, minutesOfDay, occurrenceKey } from "@/lib/utils/calendar";
 import { useNow } from "@/lib/hooks/useNow";
 import DayColumn from "../DayColumn/DayColumn";
+import DayHeading from "../DayHeading/DayHeading";
 import EventChip from "../EventChip/EventChip";
 import styles from "./TimeGrid.module.css";
 
@@ -49,26 +50,16 @@ export default function TimeGrid({ days, events, holidays, today, selectedDate, 
     <div className={styles.grid} style={{ "--days": days.length }}>
       <div className={styles.head}>
         <div className={styles.gutter} />
-        {days.map((day) => {
-          const date = keyToDate(day);
-          return (
-            <button
-              key={day}
-              type="button"
-              className={cx(
-                styles.dayHead,
-                holidays.has(day) && styles.isHoliday,
-                day === today && styles.isToday,
-                day === selectedDate && styles.isSelected,
-              )}
-              onClick={() => onDayClick(day)}
-              aria-label={`${formatDate(date, "EEEE d 'de' MMMM")}${holidays.has(day) ? `, feriado: ${holidays.get(day).name}` : ""}`}
-            >
-              <span className={styles.weekday}>{formatDate(date, "EEE").replace(".", "")}</span>
-              <span className={styles.dayNumber}>{formatDate(date, "d")}</span>
-            </button>
-          );
-        })}
+        {days.map((day) => (
+          <DayHeading
+            key={day}
+            day={day}
+            today={today}
+            selectedDate={selectedDate}
+            holiday={holidays.get(day)}
+            onClick={onDayClick}
+          />
+        ))}
       </div>
 
       <div className={cx(styles.allDay, hasAllDay && styles.hasAllDay)}>

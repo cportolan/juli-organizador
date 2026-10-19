@@ -25,6 +25,13 @@ export function otherStatus(status) {
   return status === "done" ? "pending" : "done";
 }
 
+const categoryCollator = new Intl.Collator("es", { sensitivity: "base" });
+
+/** Categorías en orden alfabético (el mismo en Pendientes y en el calendario). */
+export function sortCategories(categories) {
+  return categories.toSorted((a, b) => categoryCollator.compare(a.name, b.name));
+}
+
 /** Grupo para los pendientes que no tienen categoría. */
 export const NO_CATEGORY = { id: "none", name: "Sin categoría", color: null };
 

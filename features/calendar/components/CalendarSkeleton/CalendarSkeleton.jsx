@@ -23,11 +23,9 @@ export default function CalendarSkeleton() {
 
 export function CalendarAsideSkeleton() {
   return (
-    <RightSidebar title="Tu día" storageKey="oj-calendar-aside">
+    <RightSidebar title="Pendientes" storageKey="oj-calendar-aside">
       <div className={styles.aside} aria-busy="true">
-        <Skeleton width={120} height={18} />
-        <Skeleton height={120} radius="var(--radius-md)" />
-        <Skeleton width={100} height={18} />
+        <Skeleton height={40} radius="var(--radius-md)" />
         <Skeleton height={48} radius="var(--radius-md)" />
         <Skeleton height={40} />
         <Skeleton height={40} />

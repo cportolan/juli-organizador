@@ -1,20 +1,25 @@
 "use client";
 
-import { NotebookPen } from "lucide-react";
+import { ListTodo } from "lucide-react";
 import RightSidebar from "@/components/layout/RightSidebar/RightSidebar";
-import { useCalendarNavigation } from "../../hooks/useCalendarNavigation";
-import DayNotePanel from "../DayNotePanel/DayNotePanel";
+import Button from "@/components/ui/Button/Button";
 import CalendarTodos from "../CalendarTodos/CalendarTodos";
 import styles from "./CalendarAside.module.css";
 
-/** Panel derecho del calendario: la nota del día elegido y los pendientes. */
-export default function CalendarAside({ state, today, note, todos, categories }) {
-  const nav = useCalendarNavigation(state);
-
+/** Panel derecho del calendario: los pendientes, de a una categoría. */
+export default function CalendarAside({ todos, categories }) {
   return (
-    <RightSidebar title="Tu día" storageKey="oj-calendar-aside" fabIcon={NotebookPen}>
+    <RightSidebar
+      title="Pendientes"
+      storageKey="oj-calendar-aside"
+      fabIcon={ListTodo}
+      actions={
+        <Button href="/pendientes" variant="ghost" size="sm">
+          Ver todos
+        </Button>
+      }
+    >
       <div className={styles.aside}>
-        <DayNotePanel date={state.date} today={today} note={note} onDateChange={(date) => nav.go({ date })} />
         <CalendarTodos initialTodos={todos} categories={categories} />
       </div>
     </RightSidebar>
