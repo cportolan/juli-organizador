@@ -98,7 +98,7 @@ export async function setPersonPassword({ id, currentPassword, newPassword } = {
     const context = await peopleContext()
     const person = await loadPerson(context, id)
     if (person.password_hash && !await checkPassword(currentPassword, person.password_hash)) throw new Error('La contraseña actual no es correcta.')
-    const passwordHash = newPassword === null ? null : await hashPassword(newPassword)
+    const passwordHash = newPassword === null ? null : await hashPassword(newPassword, { minimumLength: 1 })
     checkResult(await context.admin.from('people').update({ password_hash: passwordHash, has_password: passwordHash !== null })
       .eq('user_id', context.user.id).eq('id', id), 'No se pudo guardar la contraseña de la ficha.')
     grantAccess(context, { ...person, password_hash: passwordHash })

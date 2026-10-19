@@ -36,24 +36,27 @@ export function canonicalizeRrule(value, startAt) {
   return serializeRule({ ...options, dtstart: new Date(startAt) })
 }
 
-export function expandEvent(event, from, to) {
+export function expandEvent(event, from, to, holidays = new Set()) {
   const fromDate = new Date(from)
   const toDate = new Date(to)
   const duration = new Date(event.endAt).getTime() - new Date(event.startAt).getTime()
 
   if (!event.rrule) {
     if (!overlaps(event.startAt, event.endAt, fromDate, toDate)) return []
-    return [{ ...event, occurrenceDate: event.recurrenceId ?? dateKey(event.startAt) }]
+    return [{ ...event, occurrenceDate: dateKey(event.startAt) }]
   }
 
   const rule = buildRule(event.rrule, event.startAt)
   const excluded = new Set(event.exdates)
-  const searchFrom = new Date(fromDate.getTime() - duration)
+  const padding = businessDayDirection(event.rrule) ? 32 * 86400000 : 0
+  const searchFrom = new Date(fromDate.getTime() - duration - padding)
+  const searchTo = new Date(toDate.getTime() + padding)
 
-  return rule.between(toFloatingDate(searchFrom), toFloatingDate(toDate), true)
+  return rule.between(toFloatingDate(searchFrom), toFloatingDate(searchTo), true)
     .map(fromFloatingDate)
     .filter((start) => !excluded.has(dateKey(start)))
-    .map((start) => {
+    .map((nominalStart) => {
+      const start = shiftBusinessDay(event, nominalStart, holidays)
       const end = new Date(start.getTime() + duration)
       return {
         ...event,
@@ -63,6 +66,40 @@ export function expandEvent(event, from, to) {
       }
     })
     .filter((occurrence) => overlaps(occurrence.startAt, occurrence.endAt, fromDate, toDate))
+}
+
+export function businessDayDirection(value) {
+  if (!value) return 0
+  const options = parseOptions(value)
+  const days = options.byweekday ?? []
+  const positions = Array.isArray(options.bysetpos) ? options.bysetpos : [options.bysetpos]
+  return options.freq === RRule.MONTHLY && positions.length === 1 &&
+    [1, -1].includes(positions[0]) && days.length === 5 &&
+    [0, 1, 2, 3, 4].every((day) => days.some((item) => item.weekday === day && !item.n))
+    ? positions[0] : 0
+}
+
+export function shiftBusinessDay(event, start, holidays) {
+  const direction = businessDayDirection(event.rrule)
+  if (!direction || !holidays.has(dateKey(start))) return start
+  const floating = toFloatingDate(start)
+  for (let day = 0; day < 32; day += 1) {
+    floating.setUTCDate(floating.getUTCDate() + direction)
+    const shifted = fromFloatingDate(floating)
+    if (![0, 6].includes(floating.getUTCDay()) && !holidays.has(dateKey(shifted))) return shifted
+  }
+  return start
+}
+
+// Resolve the displayed date back to the nominal RRULE identity, even if excluded.
+export function resolveOccurrenceDate(event, occurrenceDate, holidays) {
+  if (!businessDayDirection(event.rrule)) return occurrenceDate
+  const center = new Date(`${occurrenceDate}T12:00:00Z`)
+  const rule = buildRule(event.rrule, event.startAt)
+  const candidates = rule.between(new Date(+center - 32 * 86400000), new Date(+center + 32 * 86400000), true)
+  const match = candidates.map(fromFloatingDate).find((start) =>
+    dateKey(shiftBusinessDay(event, start, holidays)) === occurrenceDate)
+  return match ? dateKey(match) : null
 }
 
 export function findOccurrenceStart(event, occurrenceDate) {

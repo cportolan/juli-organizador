@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { EVENT_COLUMNS, toPublicEvent, toStoredEvent } from './eventData'
-import { expandEvent } from './recurrence'
+import { getHolidaysInRange, recurrenceHolidays } from './holidays'
+import { expandEvent, businessDayDirection } from './recurrence'
 import { isDateOnly } from './eventValidation'
 
 export async function getEvents({ from, to } = {}) {
@@ -14,9 +15,11 @@ export async function getEvents({ from, to } = {}) {
     .or(`rrule.not.is.null,series_id.not.is.null,and(start_at.lt.${rangeEnd},end_at.gte.${rangeStart})`)
   if (error) throw new Error('No se pudieron cargar los eventos.')
 
+  const holidays = data.some((event) => businessDayDirection(event.rrule))
+    ? await recurrenceHolidays(from, to) : new Set()
   return data
     .map(toStoredEvent)
-    .flatMap((event) => expandEvent(event, from, to))
+    .flatMap((event) => expandEvent(event, from, to, holidays))
     .map(toPublicEvent)
     .sort((first, second) => new Date(first.startAt) - new Date(second.startAt))
 }
@@ -62,4 +65,9 @@ function isRange(from, to) {
   const fromTime = new Date(from ?? '').getTime()
   const toTime = new Date(to ?? '').getTime()
   return Number.isFinite(fromTime) && Number.isFinite(toTime) && fromTime < toTime
+}
+
+export async function getHolidays({ from, to } = {}) {
+  if (!isDateOnly(from) || !isDateOnly(to) || from > to) throw new Error('El rango de fechas no es válido.')
+  return getHolidaysInRange({ from, to })
 }

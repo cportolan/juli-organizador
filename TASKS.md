@@ -75,6 +75,7 @@ Este contrato es lo que permite trabajar en paralelo. Claude construye la UI con
 **Calendario** — `features/calendar/`
 - `getEvents({ from, to })` → ocurrencias ya expandidas en el rango (cada una con `id`, `occurrenceDate` y los datos del evento base)
 - `createEvent(data)`, `updateEvent({ id, occurrenceDate, scope, data })`, `deleteEvent({ id, occurrenceDate, scope })` — `scope`: `'this' | 'following' | 'all'`
+- `getHolidays({ from, to })` → `[{ date, name, type }]`, fechas `YYYY-MM-DD`, rango inclusivo; incluye puentes. Si falla la API, último resultado disponible o `[]`.
 - `getDayNote(date)`, `saveDayNote({ date, content })`
 
 **Teléfonos** — `features/phones/`
@@ -191,6 +192,9 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 
 - [ ] (De Codex para Claude) Subida directa lista en `feat/direct-uploads`: en `peopleService.js`, sacar `uploadAttachment` de la exportación de actions y agregar `export { uploadAttachmentFile as uploadAttachment } from "@/features/people/uploadAttachmentFile"`. El helper acepta el FormData actual, sin tocar useAttachments. Migración `20261016183910` aplicada. Avisar cuando ya no se use la action anterior para que Codex retire `uploadAttachment`/`uploadFile` y vuelva bodySizeLimit al valor por defecto. — 2026-10-16
 
+- [x] (De Claude para Codex, solicitado por Cristian) Contraseña por ficha: aceptar cualquier string no vacío, hasta 72 bytes UTF-8 de bcrypt; mantener mínimo 8 en contraseña general. Implementado en `feat-backend-base-2`. — 2026-10-19
+- [x] (De Claude para Codex, solicitado por Cristian) Feriados de ArgentinaDatos con caché y tolerancia a fallos; correr únicamente reglas mensuales `BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1|-1`, preservando edición/borrado por fecha corrida. Implementado también `getHolidays({ from, to })`. — 2026-10-19
+
 ---
 
 ## Registro de decisiones
@@ -228,3 +232,10 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
 - 2026-10-16 (Codex, `feat/direct-uploads`): migración `20261016183910_direct_attachment_uploads.sql` aplicada al proyecto juli-organizador, con historial y SQL en una transacción; verificados grants privados y límite de bucket 10485760 bytes. Pasaron lint, build, 10 tests (recurrencia/seguridad/contrato/subida directa), migraciones desde cero y tests SQL sobre PostgreSQL 17. Verificado flujo real de 5,34 MiB contra Postgres + Storage, incluida reconfirmación sin duplicado y eliminación de todos los datos de prueba. SDK probado con Node 22.
 - 2026-10-16 (Codex, `feat/direct-uploads`): helper uploadAttachmentFile acepta objeto o FormData y conserva { ok, data | error }. No se editaron archivos de Claude. Se mantiene temporalmente la action uploadAttachment y bodySizeLimit 11 MiB porque la UI todavía los usa: retirarlos después de que Claude conecte el helper, para preservar el flujo actual durante el handoff.
 - 2026-10-16 (Claude): la UI de adjuntos usa `uploadAttachmentFile` (subida directa a Storage). `uploadAttachment` (Server Action con FormData) y `serverActions.bodySizeLimit: '11mb'` ya no se usan desde el front: Codex puede sacarlos.
+
+- 2026-10-19 (Codex, `feat-backend-base-2`): `hashPassword` conserva mínimo 8 por defecto; solo `setPersonPassword` pide mínimo 1, sin trim (espacios son válidos). Ambas contraseñas conservan máximo 72 bytes UTF-8 y bcrypt costo 12; `null` sigue quitando la contraseña.
+- 2026-10-19 (Codex, `feat-backend-base-2`): feriados desde ArgentinaDatos `/v1/feriados/{año}`, todos los tipos sin filtrar. Caché Next de 24 horas y caché por proceso por año con requests concurrentes deduplicados; timeout 3 segundos. Ante error HTTP/red/JSON se conserva el último dato válido del proceso o `[]`, y se reintenta después de 60 segundos. Sin datos disponibles la recurrencia conserva su comportamiento de lunes a viernes y el calendario sigue funcionando.
+- 2026-10-19 (Codex, `feat-backend-base-2`): solo reglas mensuales con exactamente lunes-viernes y una posición `1` o `-1` corren feriados hacia el siguiente/anterior hábil, saltando fines de semana y feriados consecutivos. Se conserva hora local y duración; búsqueda extendida 32 días a cada lado para límites de rango/año. El desplazamiento está acotado a 32 días como defensa ante datos anómalos.
+- 2026-10-19 (Codex, `feat-backend-base-2`): `occurrenceDate` público es la fecha local corrida; `exdates` y `recurrence_id` internos conservan la fecha nominal RRULE. Mutaciones resuelven la fecha pública antes de excluir/cortar, cuentan repeticiones sobre la serie nominal y anclan DTSTART de los cortes para no perder el mes corrido. Las excepciones editadas se localizan por su identidad interna y exponen la fecha visible.
+- 2026-10-19 (Codex, `feat-backend-base-2`): API opcional `getHolidays({ from, to })` devuelve `{ date, name, type }` en rango inclusivo, sin cambios de UI. Los pedidos del 19/10 no estaban presentes en este checkout de TASKS.md; se incorporaron desde el pedido explícito de Cristian.
+- 2026-10-19 (Codex, `feat-backend-base-2`): verificación final: 15 pruebas automatizadas pasan (contraseñas, seguridad/adjuntos previos, caché/fallback, recurrencia y mutaciones con transporte simulado), `npm run lint`, `npm run build` y `git diff --check` pasan. Incluye corte de la última ocurrencia corrida más allá de `UNTIL`, sin perderla. Se verificó el formato real de ArgentinaDatos 2026; no hubo cambios de frontend ni de base de datos.

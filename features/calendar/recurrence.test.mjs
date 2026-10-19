@@ -122,3 +122,34 @@ test('mantiene la fecha local de los eventos de día completo', () => {
     ],
   )
 })
+
+test('primer y último hábil: corre feriados/puentes y conserva identidad al cortar', async () => {
+  const { resolveOccurrenceDate } = await import('./recurrence.js')
+  for (const [position, startAt, endAt, holiday, expected] of [
+    [1, '2026-05-01T13:00:00Z', '2026-05-01T14:00:00Z', '2026-05-01', '2026-05-04'],
+    [-1, '2026-12-31T13:00:00Z', '2026-12-31T14:00:00Z', '2026-12-31', '2026-12-29'],
+  ]) {
+    const holidays = new Set([holiday, '2026-12-30'])
+    const event = { ...baseEvent, startAt, endAt,
+      rrule: canonicalizeRrule(`FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=${position};COUNT=3`, startAt) }
+    const from = `${expected}T03:00:00Z`
+    const to = `${expected}T23:59:59Z`
+    const occurrences = expandEvent(event, from, to, holidays)
+    assert.equal(occurrences.length, 1)
+    assert.equal(occurrences[0].occurrenceDate, expected)
+    assert.equal(occurrences[0].startAt.slice(11), '13:00:00.000Z')
+    const nominal = resolveOccurrenceDate(event, expected, holidays)
+    assert.equal(nominal, holiday)
+    assert.equal(expandEvent({ ...event, exdates: [nominal] }, from, to, holidays).length, 0)
+    const start = findOccurrenceStart(event, nominal)
+    assert.equal(splitRrule(event, start, start).previousCount, 0)
+    assert.match(splitRrule(event, start, start).nextRrule, /COUNT=3/)
+  }
+})
+
+test('no corre otras reglas aunque coincidan con feriados', () => {
+  for (const rule of ['FREQ=DAILY;COUNT=1', 'FREQ=MONTHLY;BYDAY=FR;BYSETPOS=1;COUNT=1']) {
+    const event = { ...baseEvent, startAt: '2026-05-01T13:00:00Z', endAt: '2026-05-01T14:00:00Z', rrule: rule }
+    assert.equal(expandEvent(event, '2026-05-01', '2026-05-10', new Set(['2026-05-01']))[0].occurrenceDate, '2026-05-01')
+  }
+})
