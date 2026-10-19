@@ -108,6 +108,7 @@ export default function PhoneBook({ initialPhones }) {
       <PhoneFormModal
         open={editing !== null}
         phone={editing === "new" ? null : editing}
+        phones={phones.items}
         saving={creating || updating}
         onClose={() => setEditing(null)}
         onSave={handleSave}

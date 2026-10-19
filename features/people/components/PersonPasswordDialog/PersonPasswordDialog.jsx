@@ -46,7 +46,14 @@ function PersonPasswordForm({ person, onClose, onChanged }) {
   return (
     <div className={styles.body}>
       {person.hasPassword && <SegmentedControl label="Acción" items={MODES} value={mode} onChange={setMode} size="sm" />}
-      <PasswordChangeForm key={mode} mode={mode} username={person.name} loading={saving} onSubmit={handleSubmit} />
+      <PasswordChangeForm
+        key={mode}
+        mode={mode}
+        username={person.name}
+        minLength={1}
+        loading={saving}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 }

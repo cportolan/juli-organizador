@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { toDateKey } from "@/lib/utils/dates";
 import { addDaysToKey, combineDateTime, dayStartIso, lastDayKey, minutesToTime, timeOf } from "@/lib/utils/calendar";
-import { buildRrule, parseRrule, presetIdFor, recurrencePresets, weekdayOf } from "@/lib/utils/recurrence";
+import {
+  buildRrule,
+  firstPositionMatch,
+  parseRrule,
+  presetIdFor,
+  recurrencePresets,
+  weekdayOf,
+} from "@/lib/utils/recurrence";
 
 function toMinutes(time) {
   const [hours, minutes] = time.split(":").map(Number);
@@ -41,8 +48,13 @@ export function useEventForm(event, draft) {
     setForm((current) => ({ ...current, ...changes }));
   };
 
-  /** Al mover el inicio, el fin se mueve igual (conserva la duración). */
-  function setStart({ date = form.startDate, time = form.startTime }) {
+  /**
+   * Al mover el inicio, el fin se mueve igual (conserva la duración).
+   * Con una regla tipo "el primer lunes de cada mes", el inicio salta al primer
+   * día que la cumple, así la fecha del formulario es la primera repetición.
+   */
+  function setStart({ date: picked = form.startDate, time = form.startTime }, extra = {}) {
+    const date = firstPositionMatch(picked, extra.rule ?? form.rule);
     const startMinutes = (key, value) => Date.parse(`${key}T00:00:00Z`) / 60000 + toMinutes(value);
     const duration = startMinutes(form.endDate, form.endTime) - startMinutes(form.startDate, form.startTime);
     const newStart = startMinutes(date, time);
@@ -59,7 +71,7 @@ export function useEventForm(event, draft) {
     if (date !== form.startDate && form.presetId !== "custom" && form.presetId !== "none") {
       changes.rule = recurrencePresets(date).find((preset) => preset.id === form.presetId).rule;
     }
-    set(changes);
+    set({ ...changes, ...extra });
   }
 
   function setType(type) {
@@ -80,7 +92,7 @@ export function useEventForm(event, draft) {
       set({ presetId, rule: form.rule ?? { freq: "WEEKLY", interval: 1, byDay: [weekdayOf(form.startDate)], until: null, count: null } });
       return;
     }
-    set({ presetId, rule: recurrencePresets(form.startDate).find((preset) => preset.id === presetId).rule });
+    setStart({}, { presetId, rule: recurrencePresets(form.startDate).find((preset) => preset.id === presetId).rule });
   }
 
   /** Valida y devuelve los datos para createEvent/updateEvent, o null. */

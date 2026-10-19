@@ -20,7 +20,7 @@
   flex: 1;
 }
 
-.select select {
+.select :is(select, button) {
   min-height: 36px;
   padding-block: 6px;
 }

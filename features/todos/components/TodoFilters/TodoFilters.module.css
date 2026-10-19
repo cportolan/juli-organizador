@@ -9,7 +9,7 @@
   width: auto;
 }
 
-.select select {
+.select :is(select, button) {
   min-height: 34px;
   padding-block: 5px;
   font-size: var(--text-sm);
@@ -17,7 +17,7 @@
   background: transparent;
 }
 
-.select select[data-active="true"] {
+.select :is(select, button)[data-active="true"] {
   border-color: var(--primary-strong);
   background: var(--primary-softer);
   font-weight: 500;

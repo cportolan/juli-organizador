@@ -70,7 +70,7 @@ export default function CalendarTodos({ initialTodos, categories }) {
           Ver todos
         </Button>
       </header>
-      <QuickAddTodo onAdd={create} placeholder="Anotar pendiente" />
+      <QuickAddTodo onAdd={create} categories={categories} placeholder="Anotar pendiente" />
       {pending.length === 0 ? (
         <EmptyState compact icon={ListTodo} title="Todo al día" description="Lo que anotes aparece acá y en Pendientes." />
       ) : (

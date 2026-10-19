@@ -24,3 +24,23 @@ export function statusMeta(id) {
 export function otherStatus(status) {
   return status === "done" ? "pending" : "done";
 }
+
+/** Grupo para los pendientes que no tienen categoría. */
+export const NO_CATEGORY = { id: "none", name: "Sin categoría", color: null };
+
+/**
+ * Agrupa los pendientes por categoría, en el orden de `categories`, con
+ * "Sin categoría" al final. Dentro de cada grupo va primero lo pendiente.
+ * Con `includeEmpty` también devuelve las categorías sin pendientes.
+ */
+export function groupByCategory(todos, categories, { includeEmpty = false } = {}) {
+  const buckets = new Map([...categories, NO_CATEGORY].map((category) => [category.id, []]));
+  for (const todo of todos) (buckets.get(todo.categoryId) ?? buckets.get(NO_CATEGORY.id)).push(todo);
+
+  return [...categories, NO_CATEGORY]
+    .map((category) => ({
+      category,
+      items: buckets.get(category.id).toSorted((a, b) => (a.status === b.status ? 0 : a.status === "done" ? 1 : -1)),
+    }))
+    .filter(({ category, items }) => items.length > 0 || (includeEmpty && category !== NO_CATEGORY));
+}

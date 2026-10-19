@@ -1,7 +1,7 @@
 import Skeleton from "@/components/ui/Skeleton/Skeleton";
 import styles from "./TodoBoardSkeleton.module.css";
 
-const CARDS = [[3, 2], [2]];
+const CARDS = [[3, 2], [2], [2, 1]];
 
 export default function TodoBoardSkeleton() {
   return (

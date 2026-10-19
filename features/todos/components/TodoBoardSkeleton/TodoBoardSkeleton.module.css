@@ -12,8 +12,8 @@
 
 .columns {
   display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  gap: var(--space-6);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-4);
   margin-top: var(--space-2);
 }
 
@@ -24,10 +24,4 @@
   padding: var(--space-4);
   border-radius: var(--radius-lg);
   background: var(--surface-2);
-}
-
-@media (max-width: 860px) {
-  .columns {
-    grid-template-columns: 1fr;
-  }
 }

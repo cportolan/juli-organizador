@@ -16,6 +16,7 @@ export function useTodoList(initialTodos) {
   const [runUpdate, updating] = useMutation(updateTodo, { successMessage: "Cambios guardados" });
   const [runDelete, deleting] = useMutation(deleteTodo);
   const [runStatus] = useMutation(setTodoStatus);
+  const [runMove] = useMutation(updateTodo);
   const { upsert, patch, remove, setItems } = todos;
 
   const create = useCallback(
@@ -57,6 +58,18 @@ export function useTodoList(initialTodos) {
     [runStatus, patch, upsert],
   );
 
+  /** Mover a otra categoría (al arrastrar en el kanban), también optimista. */
+  const setCategory = useCallback(
+    async (todo, categoryId) => {
+      const previous = todo.categoryId ?? null;
+      startTransition(() => patch(todo.id, { categoryId }));
+      const result = await runMove({ id: todo.id, data: { categoryId } });
+      startTransition(() => (result.ok ? upsert(result.data) : patch(todo.id, { categoryId: previous })));
+      return result;
+    },
+    [runMove, patch, upsert],
+  );
+
   /** Al borrar una categoría, sus pendientes quedan sin categoría (igual que en la base). */
   const clearCategory = useCallback(
     (categoryId) =>
@@ -72,6 +85,7 @@ export function useTodoList(initialTodos) {
     update,
     remove: removeTodo,
     setStatus,
+    setCategory,
     clearCategory,
     saving: creating || updating,
     deleting,

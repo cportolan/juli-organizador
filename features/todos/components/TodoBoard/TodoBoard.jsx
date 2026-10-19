@@ -54,13 +54,9 @@ export default function TodoBoard({ initialTodos, initialCategories }) {
   }
 
   async function handleQuickAdd(data) {
-    const { categoryId, priority } = filters.filters;
-    // Si hay un filtro de categoría o prioridad, el nuevo pendiente lo hereda para no "desaparecer".
-    return todoList.create({
-      ...data,
-      categoryId: categoryId && categoryId !== "none" ? categoryId : null,
-      priority: priority && priority !== "none" ? priority : null,
-    });
+    const { priority } = filters.filters;
+    // Si hay un filtro de prioridad, el nuevo pendiente lo hereda para no "desaparecer".
+    return todoList.create({ ...data, priority: priority && priority !== "none" ? priority : null });
   }
 
   async function handleStatus(todo, status) {
@@ -79,7 +75,12 @@ export default function TodoBoard({ initialTodos, initialCategories }) {
     if (result.ok) setDeleting(null);
   }
 
-  const handlers = { onEdit: setEditing, onStatus: handleStatus, onDelete: setDeleting };
+  const handlers = {
+    onEdit: setEditing,
+    onStatus: handleStatus,
+    onCategory: todoList.setCategory,
+    onDelete: setDeleting,
+  };
   const View = view.component;
 
   return (
@@ -107,10 +108,13 @@ export default function TodoBoard({ initialTodos, initialCategories }) {
         categories={categoryList.categories}
         activeCount={filters.activeCount}
         onClear={filters.clear}
-        hideStatus={view.id === "columns"}
       />
 
-      <QuickAddTodo onAdd={handleQuickAdd} />
+      <QuickAddTodo
+        onAdd={handleQuickAdd}
+        categories={categoryList.categories}
+        defaultCategoryId={filters.filters.categoryId || undefined}
+      />
 
       {total === 0 ? (
         <EmptyState
@@ -134,9 +138,10 @@ export default function TodoBoard({ initialTodos, initialCategories }) {
         <div key={view.id} className={styles.view}>
           <View
             todos={filters.visible}
+            categories={categoryList.categories}
             categoriesById={categoryList.byId}
             terms={filters.terms}
-            emptyHint={{ pending: "Todo al día.", done: "Arrastrá acá lo que vayas terminando." }}
+            showEmpty={!filters.isFiltering}
             {...handlers}
           />
         </div>

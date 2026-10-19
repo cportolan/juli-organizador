@@ -4,7 +4,7 @@
   align-items: center;
 }
 
-.select {
+.control {
   appearance: none;
   padding-right: 38px;
   cursor: pointer;
@@ -17,4 +17,116 @@
   height: 16px;
   color: var(--text-muted);
   pointer-events: none;
+  transition: transform var(--dur) var(--ease-out);
+}
+
+/* ---------- Escritorio: botón + menú ---------- */
+
+.trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: left;
+}
+
+.trigger .chevron {
+  top: 50%;
+  margin-top: -8px;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placeholder {
+  color: var(--text-muted);
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-full);
+  background: var(--tone);
+}
+
+.menu {
+  position: fixed;
+  inset: auto;
+  max-width: min(360px, calc(100vw - 16px));
+  max-height: min(320px, 50vh);
+  margin: 0;
+  padding: var(--space-1);
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-md);
+  outline: none;
+
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  transform-origin: top;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur) var(--ease-out),
+    overlay var(--dur-fast) allow-discrete,
+    display var(--dur-fast) allow-discrete;
+}
+
+.menu:popover-open {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .menu:popover-open {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 7px var(--space-3);
+  border-radius: var(--radius-xs);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.option[aria-selected="true"] {
+  font-weight: 500;
+}
+
+.active {
+  background: var(--surface-2);
+}
+
+.menu:focus-visible .active {
+  box-shadow: inset 0 0 0 1.5px var(--primary-strong);
+}
+
+.optionLabel {
+  flex: 1;
+  min-width: 0;
+}
+
+.check {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  color: var(--primary-strong);
 }

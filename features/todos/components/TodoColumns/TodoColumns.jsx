@@ -3,57 +3,67 @@
 import { useState, ViewTransition } from "react";
 import { cx } from "@/lib/utils/cx";
 import TodoCard from "../TodoCard/TodoCard";
-import { STATUSES } from "../todoMeta";
+import { groupByCategory, NO_CATEGORY } from "../todoMeta";
 import styles from "./TodoColumns.module.css";
 
 const DRAG_TYPE = "application/x-oj-todo";
 
-/** Vista kanban: Pendiente / Realizado. Se puede arrastrar entre columnas. */
-export default function TodoColumns({ todos, categoriesById, terms, onEdit, onStatus, onDelete, emptyHint }) {
+/**
+ * Vista kanban: una columna por categoría (y "Sin categoría").
+ * Arrastrar un pendiente a otra columna le cambia la categoría.
+ */
+export default function TodoColumns({ todos, categories, terms, showEmpty, onEdit, onStatus, onCategory, onDelete }) {
   const [dropTarget, setDropTarget] = useState(null);
+  const groups = groupByCategory(todos, categories, { includeEmpty: showEmpty });
 
   function handleDragStart(event, todo) {
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData(DRAG_TYPE, todo.id);
   }
 
-  function handleDragOver(event, status) {
+  function handleDragOver(event, groupId) {
     if (!event.dataTransfer.types.includes(DRAG_TYPE)) return;
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
-    if (dropTarget !== status) setDropTarget(status);
+    if (dropTarget !== groupId) setDropTarget(groupId);
   }
 
   function handleDragLeave(event) {
     if (!event.currentTarget.contains(event.relatedTarget)) setDropTarget(null);
   }
 
-  function handleDrop(event, status) {
+  function handleDrop(event, groupId) {
     event.preventDefault();
     setDropTarget(null);
     const todo = todos.find((item) => item.id === event.dataTransfer.getData(DRAG_TYPE));
-    if (todo) onStatus(todo, status);
+    const categoryId = groupId === NO_CATEGORY.id ? null : groupId;
+    if (todo && (todo.categoryId ?? null) !== categoryId) onCategory(todo, categoryId);
   }
 
   return (
     <div className={styles.columns}>
-      {STATUSES.map((status) => {
-        const items = todos.filter((todo) => todo.status === status.id);
+      {groups.map(({ category, items }) => {
+        const pending = items.filter((todo) => todo.status !== "done").length;
+        const headingId = `todo-column-${category.id}`;
         return (
           <section
-            key={status.id}
-            className={cx(styles.column, styles[status.id], dropTarget === status.id && styles.dropping)}
-            aria-labelledby={`todo-column-${status.id}`}
-            onDragOver={(event) => handleDragOver(event, status.id)}
+            key={category.id}
+            className={cx(styles.column, !category.color && styles.uncategorized, dropTarget === category.id && styles.dropping)}
+            style={category.color ? { "--tone": category.color } : undefined}
+            aria-labelledby={headingId}
+            onDragOver={(event) => handleDragOver(event, category.id)}
             onDragLeave={handleDragLeave}
-            onDrop={(event) => handleDrop(event, status.id)}
+            onDrop={(event) => handleDrop(event, category.id)}
           >
             <header className={styles.header}>
-              <status.icon className={styles.icon} aria-hidden />
-              <h2 id={`todo-column-${status.id}`} className={styles.title}>
-                {status.plural}
+              <span className={styles.dot} aria-hidden />
+              <h2 id={headingId} className={styles.title}>
+                {category.name}
               </h2>
-              <span className={styles.count}>{items.length}</span>
+              <span className={styles.count} title={`${pending} pendientes de ${items.length}`}>
+                {pending}
+                {pending !== items.length && <span className={styles.total}>/{items.length}</span>}
+              </span>
             </header>
             <ul className={styles.list}>
               {items.map((todo) => (
@@ -61,7 +71,6 @@ export default function TodoColumns({ todos, categoriesById, terms, onEdit, onSt
                   <li>
                     <TodoCard
                       todo={todo}
-                      category={categoriesById.get(todo.categoryId)}
                       terms={terms}
                       draggable
                       onDragStart={handleDragStart}
@@ -73,9 +82,7 @@ export default function TodoColumns({ todos, categoriesById, terms, onEdit, onSt
                 </ViewTransition>
               ))}
             </ul>
-            {items.length === 0 && (
-              <p className={styles.empty}>{status.id === "pending" ? emptyHint.pending : emptyHint.done}</p>
-            )}
+            {items.length === 0 && <p className={styles.empty}>Arrastrá acá un pendiente.</p>}
           </section>
         );
       })}

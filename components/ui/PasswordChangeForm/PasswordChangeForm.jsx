@@ -11,8 +11,17 @@ export const MIN_PASSWORD_LENGTH = 8;
  * Poner, cambiar o quitar una contraseña. mode: "set" | "change" | "remove".
  * `onSubmit({ currentPassword, newPassword })` devuelve { ok, error }; si el
  * error habla de la contraseña actual, se muestra en ese campo.
+ * `minLength` en 1 permite cualquier contraseña no vacía.
  */
-export default function PasswordChangeForm({ mode, username, onSubmit, onCancel, loading = false, className }) {
+export default function PasswordChangeForm({
+  mode,
+  username,
+  onSubmit,
+  onCancel,
+  loading = false,
+  minLength = MIN_PASSWORD_LENGTH,
+  className,
+}) {
   const [errors, setErrors] = useState({});
 
   async function handleSubmit(event) {
@@ -25,7 +34,8 @@ export default function PasswordChangeForm({ mode, username, onSubmit, onCancel,
     const found = {};
     if (mode !== "set" && !current) found.current = "Escribí la contraseña actual.";
     if (mode !== "remove") {
-      if (next.length < MIN_PASSWORD_LENGTH) found.next = `Tiene que tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`;
+      if (!next) found.next = "Escribí una contraseña.";
+      else if (next.length < minLength) found.next = `Tiene que tener al menos ${minLength} caracteres.`;
       else if (next !== confirm) found.confirm = "Las contraseñas no coinciden.";
     }
     setErrors(found);
@@ -45,7 +55,7 @@ export default function PasswordChangeForm({ mode, username, onSubmit, onCancel,
           <PasswordInput
             name="next"
             label={mode === "change" ? "Nueva contraseña" : "Contraseña"}
-            hint={`Mínimo ${MIN_PASSWORD_LENGTH} caracteres.`}
+            hint={minLength > 1 ? `Mínimo ${minLength} caracteres.` : undefined}
             error={errors.next}
             autoComplete="new-password"
           />

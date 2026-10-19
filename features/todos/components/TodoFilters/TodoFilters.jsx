@@ -8,9 +8,9 @@ import { PRIORITIES, STATUSES } from "../todoMeta";
 import styles from "./TodoFilters.module.css";
 
 /** Filtros básicos: estado, prioridad, categoría y fecha de creación. */
-export default function TodoFilters({ filters, setFilter, categories, activeCount, onClear, hideStatus = false }) {
+export default function TodoFilters({ filters, setFilter, categories, activeCount, onClear }) {
   const selects = [
-    !hideStatus && {
+    {
       key: "status",
       label: "Estado",
       placeholder: "Cualquier estado",
@@ -37,7 +37,7 @@ export default function TodoFilters({ filters, setFilter, categories, activeCoun
       placeholder: "Cualquier fecha",
       options: CREATED_RANGES.map(({ value, label }) => ({ value, label })),
     },
-  ].filter(Boolean);
+  ];
 
   return (
     <div className={styles.filters} role="group" aria-label="Filtros">
