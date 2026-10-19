@@ -18,7 +18,7 @@ function isTyping(target) {
 }
 
 /** El calendario: barra, vista elegida y edición de eventos. */
-export default function CalendarView({ state, today, days, events }) {
+export default function CalendarView({ state, today, days, events, holidays = [] }) {
   const nav = useCalendarNavigation(state);
   const editor = useEventEditor({ onDone: nav.refresh });
   const now = useNow();
@@ -26,6 +26,8 @@ export default function CalendarView({ state, today, days, events }) {
     const text = periodLabel(state, days);
     return text.charAt(0).toUpperCase() + text.slice(1);
   }, [state, days]);
+
+  const holidaysByDay = useMemo(() => new Map(holidays.map((holiday) => [holiday.date, holiday])), [holidays]);
 
   const isCurrent = days.includes(today) && (state.view !== "dia" || state.date === today);
 
@@ -64,6 +66,7 @@ export default function CalendarView({ state, today, days, events }) {
   const viewProps = {
     days,
     events,
+    holidays: holidaysByDay,
     today,
     selectedDate: state.date,
     onCreate: createAt,

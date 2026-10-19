@@ -142,3 +142,21 @@
     font-size: var(--text-md);
   }
 }
+
+/* Feriados (ArgentinaDatos) */
+.isHoliday .weekday,
+.isHoliday:not(.isToday) .dayNumber {
+  color: var(--ink-rose);
+}
+
+.holiday {
+  display: block;
+  padding: 1px var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-xs);
+  background: color-mix(in oklab, var(--tone-rose) 22%, var(--surface));
+  font-size: var(--text-xs);
+  color: var(--ink-rose);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

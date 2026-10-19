@@ -116,3 +116,25 @@
     font-size: var(--text-xs);
   }
 }
+
+/* Feriados (ArgentinaDatos): fondo rayado suave y el nombre debajo del número */
+.holiday {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 6px,
+    color-mix(in oklab, var(--tone-rose) 14%, transparent) 6px 7px
+  );
+}
+
+.holiday .number:not(.today) {
+  color: var(--ink-rose);
+}
+
+.holidayName {
+  padding-inline: 4px;
+  overflow: hidden;
+  font-size: var(--text-xs);
+  color: var(--ink-rose);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

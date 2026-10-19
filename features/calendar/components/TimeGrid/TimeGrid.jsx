@@ -13,7 +13,7 @@ const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
 const DEFAULT_SCROLL_HOUR = 8;
 
 /** Vista de semana (7, 5 o 3 días) y de día: fila de "todo el día" y grilla horaria. */
-export default function TimeGrid({ days, events, today, selectedDate, onCreate, onOpen, onDayClick }) {
+export default function TimeGrid({ days, events, holidays, today, selectedDate, onCreate, onOpen, onDayClick }) {
   const scrollerRef = useRef(null);
   const now = useNow();
   const nowMinutes = now === null ? null : minutesOfDay(new Date(now).toISOString());
@@ -43,7 +43,7 @@ export default function TimeGrid({ days, events, today, selectedDate, onCreate, 
     scroller.scrollTop = firstHour * (scroller.scrollHeight / 24);
   }, [firstHour, nowMinutes]);
 
-  const hasAllDay = allDay.some((list) => list.length);
+  const hasAllDay = allDay.some((list) => list.length) || days.some((day) => holidays.has(day));
 
   return (
     <div className={styles.grid} style={{ "--days": days.length }}>
@@ -55,9 +55,14 @@ export default function TimeGrid({ days, events, today, selectedDate, onCreate, 
             <button
               key={day}
               type="button"
-              className={cx(styles.dayHead, day === today && styles.isToday, day === selectedDate && styles.isSelected)}
+              className={cx(
+                styles.dayHead,
+                holidays.has(day) && styles.isHoliday,
+                day === today && styles.isToday,
+                day === selectedDate && styles.isSelected,
+              )}
               onClick={() => onDayClick(day)}
-              aria-label={formatDate(date, "EEEE d 'de' MMMM")}
+              aria-label={`${formatDate(date, "EEEE d 'de' MMMM")}${holidays.has(day) ? `, feriado: ${holidays.get(day).name}` : ""}`}
             >
               <span className={styles.weekday}>{formatDate(date, "EEE").replace(".", "")}</span>
               <span className={styles.dayNumber}>{formatDate(date, "d")}</span>
@@ -74,6 +79,11 @@ export default function TimeGrid({ days, events, today, selectedDate, onCreate, 
             className={styles.allDayCell}
             onClick={() => onCreate({ date: day, allDay: true })}
           >
+            {holidays.has(day) && (
+              <span className={styles.holiday} title={holidays.get(day).name}>
+                {holidays.get(day).name}
+              </span>
+            )}
             {allDay[index].map((event) => (
               <EventChip key={occurrenceKey(event)} event={event} showTime={false} onOpen={onOpen} />
             ))}

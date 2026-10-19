@@ -16,7 +16,7 @@ function sortForDay(events) {
 }
 
 /** Vista mensual: semanas de lunes a domingo. */
-export default function MonthView({ days, month, events, today, selectedDate, onCreate, onOpen, onDayClick }) {
+export default function MonthView({ days, month, events, holidays, today, selectedDate, onCreate, onOpen, onDayClick }) {
   const byDay = useMemo(() => days.map((day) => sortForDay(eventsOnDay(events, day))), [days, events]);
 
   return (
@@ -31,10 +31,16 @@ export default function MonthView({ days, month, events, today, selectedDate, on
           const dayEvents = byDay[index];
           const hidden = dayEvents.length - MAX_VISIBLE;
           const outside = day.slice(0, 7) !== month;
+          const holiday = holidays.get(day);
           return (
             <div
               key={day}
-              className={cx(styles.cell, outside && styles.outside, day === selectedDate && styles.selected)}
+              className={cx(
+                styles.cell,
+                outside && styles.outside,
+                holiday && styles.holiday,
+                day === selectedDate && styles.selected,
+              )}
               onClick={() => onCreate({ date: day, allDay: true })}
             >
               <button
@@ -44,10 +50,15 @@ export default function MonthView({ days, month, events, today, selectedDate, on
                   event.stopPropagation();
                   onDayClick(day);
                 }}
-                aria-label={formatDate(keyToDate(day), "EEEE d 'de' MMMM")}
+                aria-label={`${formatDate(keyToDate(day), "EEEE d 'de' MMMM")}${holiday ? `, feriado: ${holiday.name}` : ""}`}
               >
                 {Number(day.slice(8))}
               </button>
+              {holiday && (
+                <span className={styles.holidayName} title={holiday.name} aria-hidden>
+                  {holiday.name}
+                </span>
+              )}
               <div className={styles.events}>
                 {dayEvents.slice(0, hidden > 0 ? MAX_VISIBLE - 1 : MAX_VISIBLE).map((event) => (
                   <EventChip key={occurrenceKey(event)} event={event} onOpen={onOpen} />
