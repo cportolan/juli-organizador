@@ -64,7 +64,7 @@ export async function updateEvent({ id, occurrenceDate, scope, data } = {}) {
       context.user,
       root,
       target,
-      target.recurrenceId ?? occurrenceDate,
+      occurrenceDate,
       data,
     )
   } else {
@@ -72,8 +72,9 @@ export async function updateEvent({ id, occurrenceDate, scope, data } = {}) {
       context.supabase,
       context.user,
       root,
-      target.recurrenceId ?? occurrenceDate,
+      occurrenceDate,
       data,
+      target,
     )
   }
 
@@ -99,9 +100,9 @@ export async function deleteEvent({ id, occurrenceDate, scope } = {}) {
   if (!root.rrule || scope === 'all') {
     result = await deleteWholeSeries(context.supabase, root.id)
   } else if (scope === 'this') {
-    result = await deleteOneOccurrence(context.supabase, root, target, target.recurrenceId ?? occurrenceDate)
+    result = await deleteOneOccurrence(context.supabase, root, target, occurrenceDate)
   } else {
-    result = await deleteFollowing(context.supabase, root, target.recurrenceId ?? occurrenceDate)
+    result = await deleteFollowing(context.supabase, root, occurrenceDate, target)
   }
 
   if (result.error) return actionError(result.error)

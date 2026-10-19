@@ -1,6 +1,7 @@
 import { EVENT_COLUMNS, toEventRow, toPublicEvent, toStoredEvent } from './eventData'
 import { validateEventInput } from './eventValidation'
-import { findOccurrenceStart, splitRrule } from './recurrence'
+import { findOccurrenceStart, splitRrule, dateKey, shiftBusinessDay, resolveOccurrenceDate, businessDayDirection } from './recurrence'
+import { recurrenceHolidays } from './holidays'
 
 export async function fetchEvent(supabase, id) {
   const { data, error } = await supabase
@@ -25,8 +26,12 @@ export async function updateWholeSeries(supabase, root, input) {
 }
 
 export async function updateOneOccurrence(supabase, user, root, target, occurrenceDate, input) {
+  const resolved = await resolveMutationOccurrence(root, occurrenceDate, target)
+  if (!resolved) return { error: 'No se encontró esa repetición del evento.' }
+  occurrenceDate = resolved.date
+
   const existing = target.seriesId
-    ? target
+    ? { event: target }
     : await findException(supabase, root.id, occurrenceDate)
   if (existing?.error) return existing
 
@@ -36,8 +41,9 @@ export async function updateOneOccurrence(supabase, user, root, target, occurren
     return updateEventRow(supabase, existing.event.id, toEventRow(validation.event))
   }
 
-  const occurrenceStart = findOccurrenceStart(root, occurrenceDate)
-  if (!occurrenceStart || root.exdates.includes(occurrenceDate)) return { error: 'No se encontró esa repetición del evento.' }
+  const nominalStart = findOccurrenceStart(root, occurrenceDate)
+  const occurrenceStart = nominalStart && shiftBusinessDay(root, nominalStart, resolved.holidays)
+  if (!occurrenceStart || (root.exdates.includes(occurrenceDate) && !target?.seriesId)) return { error: 'No se encontró esa repetición del evento.' }
   const duration = new Date(root.endAt).getTime() - new Date(root.startAt).getTime()
   const occurrenceBase = {
     ...root,
@@ -69,20 +75,37 @@ export async function updateOneOccurrence(supabase, user, root, target, occurren
   return { event: { ...toStoredEvent(data), occurrenceDate } }
 }
 
-export async function updateFollowing(supabase, user, root, occurrenceDate, input) {
-  const occurrenceStart = findOccurrenceStart(root, occurrenceDate)
-  if (!occurrenceStart || root.exdates.includes(occurrenceDate)) return { error: 'No se encontró esa repetición del evento.' }
+export async function updateFollowing(supabase, user, root, occurrenceDate, input, target = null) {
+  const resolved = await resolveMutationOccurrence(root, occurrenceDate, target)
+  if (!resolved) return { error: 'No se encontró esa repetición del evento.' }
+  occurrenceDate = resolved.date
+
+  const nominalStart = findOccurrenceStart(root, occurrenceDate)
+  const occurrenceStart = nominalStart && shiftBusinessDay(root, nominalStart, resolved.holidays)
+  if (!occurrenceStart || (root.exdates.includes(occurrenceDate) && !target?.seriesId)) return { error: 'No se encontró esa repetición del evento.' }
   const duration = new Date(root.endAt).getTime() - new Date(root.startAt).getTime()
   const occurrenceBase = {
     ...root,
     startAt: occurrenceStart.toISOString(),
     endAt: new Date(occurrenceStart.getTime() + duration).toISOString(),
-    exdates: root.exdates.filter((date) => date >= occurrenceDate),
+    exdates: root.exdates.filter((date) => date > occurrenceDate),
   }
-  const validation = validateEventInput(input, occurrenceBase)
+  // The cut inherits its rule below. Validate visible fields independently:
+  // a holiday can shift the final occurrence past the nominal UNTIL.
+  const validation = validateEventInput(
+    businessDayDirection(root.rrule) ? { ...input, rrule: null } : input,
+    occurrenceBase,
+  )
   if (!validation.ok) return validation
 
-  const split = splitRrule(root, occurrenceStart, new Date(validation.event.startAt))
+  // Anchor the new RRULE on its nominal date; the reader shifts it again.
+  // Using the displayed first business day as DTSTART would skip this month.
+  if (businessDayDirection(root.rrule)) {
+    const delta = +nominalStart - +occurrenceStart
+    validation.event.startAt = new Date(+new Date(validation.event.startAt) + delta).toISOString()
+    validation.event.endAt = new Date(+new Date(validation.event.endAt) + delta).toISOString()
+  }
+  const split = splitRrule(root, nominalStart, new Date(validation.event.startAt))
   validation.event.rrule = split.nextRrule
   const futureDelete = await deleteFutureExceptions(supabase, root.id, occurrenceDate)
   if (futureDelete.error) return futureDelete
@@ -107,6 +130,10 @@ export async function updateFollowing(supabase, user, root, occurrenceDate, inpu
 }
 
 export async function deleteOneOccurrence(supabase, root, target, occurrenceDate) {
+  const resolved = await resolveMutationOccurrence(root, occurrenceDate, target)
+  if (!resolved) return { error: 'No se encontró esa repetición del evento.' }
+  occurrenceDate = resolved.date
+
   const date = target.recurrenceId ?? occurrenceDate
   const exdateResult = await setExdates(supabase, root, [...root.exdates, date])
   if (exdateResult.error) return exdateResult
@@ -117,13 +144,18 @@ export async function deleteOneOccurrence(supabase, root, target, occurrenceDate
     .eq('series_id', root.id)
     .eq('recurrence_id', date)
   if (error) return { error: 'No se pudo borrar esa repetición.' }
-  return { data: { id: root.id, occurrenceDate: date } }
+  return { data: { id: root.id, occurrenceDate: resolved.displayDate } }
 }
 
-export async function deleteFollowing(supabase, root, occurrenceDate) {
-  const occurrenceStart = findOccurrenceStart(root, occurrenceDate)
+export async function deleteFollowing(supabase, root, occurrenceDate, target = null) {
+  const resolved = await resolveMutationOccurrence(root, occurrenceDate, target)
+  if (!resolved) return { error: 'No se encontró esa repetición del evento.' }
+  occurrenceDate = resolved.date
+
+  const nominalStart = findOccurrenceStart(root, occurrenceDate)
+  const occurrenceStart = nominalStart && shiftBusinessDay(root, nominalStart, resolved.holidays)
   if (!occurrenceStart) return { error: 'No se encontró esa repetición del evento.' }
-  const split = splitRrule(root, occurrenceStart, occurrenceStart)
+  const split = splitRrule(root, nominalStart, occurrenceStart)
   if (!split.beforeRrule) return deleteWholeSeries(supabase, root.id)
 
   const exceptions = await deleteFutureExceptions(supabase, root.id, occurrenceDate)
@@ -133,7 +165,7 @@ export async function deleteFollowing(supabase, root, occurrenceDate) {
     exdates: root.exdates.filter((date) => date < occurrenceDate),
   })
   if (updated.error) return updated
-  return { data: { id: root.id, occurrenceDate } }
+  return { data: { id: root.id, occurrenceDate: resolved.displayDate } }
 }
 
 export async function deleteWholeSeries(supabase, id) {
@@ -144,7 +176,7 @@ export async function deleteWholeSeries(supabase, id) {
 }
 
 export function publicMutationEvent(event, occurrenceDate = null) {
-  return toPublicEvent(occurrenceDate ? { ...event, occurrenceDate } : event)
+  return toPublicEvent(occurrenceDate ? { ...event, occurrenceDate: event.startAt ? dateKey(event.startAt) : occurrenceDate } : event)
 }
 
 async function updateEventRow(supabase, id, row) {
@@ -183,4 +215,12 @@ async function deleteFutureExceptions(supabase, seriesId, occurrenceDate) {
     .eq('series_id', seriesId)
     .gte('recurrence_id', occurrenceDate)
   return error ? { error: 'No se pudieron actualizar las excepciones de la serie.' } : {}
+}
+
+async function resolveMutationOccurrence(root, displayDate, target) {
+  const holidays = businessDayDirection(root.rrule)
+    ? await recurrenceHolidays(displayDate, displayDate) : new Set()
+  // Exceptions already carry a stable nominal recurrenceId in storage.
+  const date = target?.recurrenceId ?? resolveOccurrenceDate(root, displayDate, holidays)
+  return date ? { date, displayDate, holidays } : null
 }
