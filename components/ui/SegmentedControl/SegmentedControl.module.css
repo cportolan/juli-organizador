@@ -57,6 +57,13 @@
   --font-size: var(--text-sm);
 }
 
+/* Píldora: todo redondo, para ir dentro de barras redondeadas */
+.pill,
+.pill .indicator,
+.pill .option {
+  border-radius: var(--radius-full);
+}
+
 .icon {
   width: 16px;
   height: 16px;

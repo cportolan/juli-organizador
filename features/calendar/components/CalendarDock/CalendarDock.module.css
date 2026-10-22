@@ -57,9 +57,14 @@
   }
 }
 
+/*
+ * Teléfono: barra y botón de pendientes del mismo alto (--control), redondos y
+ * concéntricos. Un degradé del fondo los separa del contenido que pasa por debajo.
+ */
 @media (max-width: 640px) {
-  /* Fijo sobre la barra de pestañas, aunque la vista sea corta */
   .dock {
+    --control: 52px;
+
     position: fixed;
     right: var(--space-4);
     bottom: var(--tabbar-height);
@@ -67,21 +72,54 @@
     margin-top: 0;
   }
 
+  .dock::before {
+    content: "";
+    position: absolute;
+    right: calc(var(--space-4) * -1);
+    bottom: 0;
+    left: calc(var(--space-4) * -1);
+    height: calc(var(--control) + var(--space-4) * 2);
+    background: linear-gradient(to top, var(--bg) 55%, transparent);
+    pointer-events: none;
+  }
+
   .bar {
     bottom: var(--space-4);
     left: 0;
     translate: none;
-    max-width: calc(100% - 64px);
-    padding: 5px;
+    gap: var(--space-1);
+    height: var(--control);
+    max-width: calc(100% - var(--control) - var(--space-3));
+    padding: 4px;
     border-radius: var(--radius-full);
   }
 
-  /* "+" redondo: el texto queda para lectores de pantalla (aria-label) */
+  .bar .views {
+    --height: 36px;
+    --font-size: var(--text-sm);
+
+    height: 100%;
+  }
+
+  .bar .views > [role="radio"] {
+    padding-inline: 14px;
+  }
+
+  .newDivider {
+    display: none;
+  }
+
+  /* "+" redondo del mismo alto que el selector: el texto queda en aria-label */
   .newEvent {
-    width: 40px;
-    height: 40px;
+    width: calc(var(--control) - 10px);
+    height: calc(var(--control) - 10px);
     padding: 0;
     border-radius: var(--radius-full);
+  }
+
+  .newEvent svg {
+    width: 20px;
+    height: 20px;
   }
 
   .newLabel {

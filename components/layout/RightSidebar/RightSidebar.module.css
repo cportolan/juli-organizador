@@ -134,7 +134,10 @@
 
 /* Teléfono: hoja que sube desde abajo, del alto de su contenido */
 @media (max-width: 640px) {
+  /* Mismo alto y misma línea que el menú flotante del calendario */
   .fab {
+    width: 52px;
+    height: 52px;
     border-radius: var(--radius-full);
   }
 

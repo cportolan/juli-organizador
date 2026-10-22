@@ -10,7 +10,7 @@ import styles from "./SegmentedControl.module.css";
  * Selector de una opción entre pocas (vistas, modos).
  * items: [{ id, label, icon? }] — con `iconOnly` muestra solo íconos.
  */
-export default function SegmentedControl({ items, value, onChange, label, iconOnly = false, size = "md", className }) {
+export default function SegmentedControl({ items, value, onChange, label, iconOnly = false, size = "md", pill = false, className }) {
   const ref = useRef(null);
   useSlidingIndicator(ref, value);
   const onKeyDown = useRovingFocus({ items, value, onChange });
@@ -20,7 +20,7 @@ export default function SegmentedControl({ items, value, onChange, label, iconOn
       ref={ref}
       role="radiogroup"
       aria-label={label}
-      className={cx(styles.group, styles[size], className)}
+      className={cx(styles.group, styles[size], pill && styles.pill, className)}
       onKeyDown={onKeyDown}
     >
       <span className={styles.indicator} aria-hidden />

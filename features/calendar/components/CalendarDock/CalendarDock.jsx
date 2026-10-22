@@ -1,6 +1,7 @@
 "use client";
 
 import { Clock3, LayoutList, Plus } from "lucide-react";
+import { cx } from "@/lib/utils/cx";
 import Button from "@/components/ui/Button/Button";
 import SegmentedControl from "@/components/ui/SegmentedControl/SegmentedControl";
 import styles from "./CalendarDock.module.css";
@@ -32,7 +33,7 @@ export default function CalendarDock({ state, layout, phone = false, onView, onL
   return (
     <div className={styles.dock}>
       <div className={styles.bar} role="toolbar" aria-label="Vista del calendario">
-        <SegmentedControl label="Vista" items={VIEW_ITEMS} value={state.view} onChange={onView} size="sm" />
+        <SegmentedControl label="Vista" items={VIEW_ITEMS} value={state.view} onChange={onView} size="sm" pill={phone} className={styles.views} />
         {showLayout && (
           <>
             <span className={styles.divider} aria-hidden />
@@ -45,7 +46,7 @@ export default function CalendarDock({ state, layout, phone = false, onView, onL
             <SegmentedControl label="Días visibles" items={DAY_ITEMS} value={state.days} onChange={onDays} size="sm" />
           </>
         )}
-        <span className={styles.divider} aria-hidden />
+        <span className={cx(styles.divider, styles.newDivider)} aria-hidden />
         <Button
           variant="primary"
           size="sm"
