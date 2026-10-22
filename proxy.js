@@ -2,6 +2,10 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
 export async function proxy(request) {
+  // Native auth endpoints validate credentials/tickets themselves and must not redirect to HTML.
+  if (['/api/mobile/auth', '/api/mobile/session', '/api/mobile/status'].includes(request.nextUrl.pathname)) {
+    return NextResponse.next({ request })
+  }
   let response = NextResponse.next({ request })
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
@@ -29,11 +33,15 @@ export async function proxy(request) {
   const isPublic = isLogin || pathname === '/favicon.ico'
 
   if (!user && !isPublic) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    const redirect = NextResponse.redirect(new URL('/login', request.url))
+    response.cookies.getAll().forEach(cookie => redirect.cookies.set(cookie))
+    return redirect
   }
 
   if (user && isLogin) {
-    return NextResponse.redirect(new URL('/calendario', request.url))
+    const redirect = NextResponse.redirect(new URL('/calendario', request.url))
+    response.cookies.getAll().forEach(cookie => redirect.cookies.set(cookie))
+    return redirect
   }
 
   return response
