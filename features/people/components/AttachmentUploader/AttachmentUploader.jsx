@@ -80,7 +80,8 @@ export default function AttachmentUploader({ uploading, onUpload }) {
       >
         <Upload className={styles.icon} aria-hidden />
         <span>
-          <strong>Elegí un archivo</strong> o soltalo acá
+          <strong>Elegí un archivo</strong>
+          <span className={styles.dropHint}> o soltalo acá</span>
         </span>
         <span className={styles.hint}>PDF, imágenes, documentos · hasta {formatFileSize(MAX_FILE_SIZE)}</span>
         <input ref={inputRef} type="file" className="visually-hidden" onChange={(event) => choose(event.target.files[0])} />

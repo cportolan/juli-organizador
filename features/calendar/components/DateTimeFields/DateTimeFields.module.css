@@ -48,3 +48,28 @@
   color: var(--danger-strong);
   animation: rise-in var(--dur) var(--ease-out);
 }
+
+/* Teléfono: fecha y hora lado a lado, sin saltos de línea */
+@media (max-width: 640px) {
+  .row {
+    display: grid;
+    grid-template-columns: 60px minmax(0, 1.5fr) minmax(0, 1fr);
+    flex-wrap: nowrap;
+  }
+
+  .label {
+    width: auto;
+  }
+
+  .input {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    padding-inline: var(--space-2);
+  }
+
+  /* Todo el día: solo la fecha, que ocupa las dos columnas */
+  .row > .input:last-child:nth-child(2) {
+    grid-column: span 2;
+  }
+}

@@ -358,3 +358,21 @@
 .content:global(.resize-cursor) {
   cursor: col-resize;
 }
+
+/* Teléfono: la barra en una sola fila que se desliza, para no comerse la pantalla */
+@media (max-width: 640px) {
+  .toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .toolbar > * {
+    flex-shrink: 0;
+  }
+}

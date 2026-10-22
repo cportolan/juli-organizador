@@ -11,6 +11,19 @@ export const metadata = {
   description: "Agenda, pendientes, teléfonos y notas de Juli.",
 };
 
+// viewport-fit=cover habilita env(safe-area-inset-*) para la barra de pestañas;
+// con resizes-content el teclado achica la página en vez de taparla.
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f3ee" },
+    { media: "(prefers-color-scheme: dark)", color: "#19181d" },
+  ],
+};
+
 export default function RootLayout({ children }) {
   return (
     <html

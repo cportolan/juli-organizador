@@ -3,8 +3,10 @@
 import { useEffect, useMemo } from "react";
 import { cx } from "@/lib/utils/cx";
 import { addDaysToKey, combineDateTime, dayStartIso, minutesToTime, periodLabel, stepDate } from "@/lib/utils/calendar";
+import { capitalize } from "@/lib/utils/format";
 import { useNow } from "@/lib/hooks/useNow";
 import { useStoredState } from "@/lib/hooks/useStoredState";
+import { PHONE_QUERY, useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { useCalendarNavigation } from "../../hooks/useCalendarNavigation";
 import { useEventEditor } from "../../hooks/useEventEditor";
 import CalendarToolbar from "../CalendarToolbar/CalendarToolbar";
@@ -26,10 +28,10 @@ export default function CalendarView({ state, today, days, events, holidays = []
   const editor = useEventEditor({ onDone: nav.refresh });
   const now = useNow();
   const [layout, setLayout] = useStoredState("oj-calendar-layout", "tarjetas");
-  const label = useMemo(() => {
-    const text = periodLabel(state, days);
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  }, [state, days]);
+  // En el teléfono la grilla con horarios no se lee: semana y día van siempre como agenda.
+  const phone = useMediaQuery(PHONE_QUERY);
+  const viewLayout = phone ? "tarjetas" : layout;
+  const label = useMemo(() => capitalize(periodLabel(state, days)), [state, days]);
 
   const holidaysByDay = useMemo(() => new Map(holidays.map((holiday) => [holiday.date, holiday])), [holidays]);
 
@@ -88,10 +90,10 @@ export default function CalendarView({ state, today, days, events, holidays = []
         onStep={(direction) => nav.go({ date: stepDate(state, direction) })}
       />
 
-      <div key={`${state.view}:${layout}:${days[0]}:${days.length}`} className={cx(styles.view, nav.pending && styles.pending)}>
+      <div key={`${state.view}:${viewLayout}:${days[0]}:${days.length}`} className={cx(styles.view, nav.pending && styles.pending)}>
         {state.view === "mes" ? (
           <MonthView {...viewProps} month={state.date.slice(0, 7)} />
-        ) : layout === "tarjetas" ? (
+        ) : viewLayout === "tarjetas" ? (
           <AgendaColumns {...viewProps} />
         ) : (
           <TimeGrid {...viewProps} />
@@ -101,6 +103,7 @@ export default function CalendarView({ state, today, days, events, holidays = []
       <CalendarDock
         state={state}
         layout={layout}
+        phone={phone}
         onView={(view) => nav.go({ view })}
         onLayout={setLayout}
         onDays={(count) => nav.go({ view: "semana", days: count })}

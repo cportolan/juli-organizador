@@ -42,3 +42,22 @@
     font-size: var(--text-xl);
   }
 }
+
+/* Teléfono: período a la izquierda y los controles a la derecha, en una sola fila */
+@media (max-width: 640px) {
+  .toolbar {
+    flex-wrap: nowrap;
+    gap: var(--space-2);
+  }
+
+  .period {
+    order: -1;
+    min-width: 0;
+    font-size: var(--text-lg);
+    line-height: 1.25;
+  }
+
+  .nav > :first-child {
+    margin-right: var(--space-1);
+  }
+}

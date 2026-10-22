@@ -106,17 +106,6 @@
   color: var(--text);
 }
 
-@media (max-width: 640px) {
-  .cell {
-    padding: 2px;
-  }
-
-  .number {
-    min-width: 24px;
-    height: 24px;
-    font-size: var(--text-xs);
-  }
-}
 
 /* Feriados (ArgentinaDatos): fondo rayado suave y el nombre debajo del número */
 .holiday {
@@ -138,4 +127,77 @@
   color: var(--ink-rose);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Teléfono: grilla compacta con puntos; los eventos del día tocado van abajo */
+.compact {
+  height: auto;
+}
+
+.compact .weekdays {
+  border-bottom: none;
+  text-align: center;
+}
+
+.compact .weekdays span {
+  padding-left: 0;
+}
+
+.compact .grid {
+  grid-template-rows: none;
+  grid-auto-rows: 52px;
+  row-gap: 2px;
+}
+
+.compact .cell {
+  align-items: center;
+  justify-content: flex-start;
+  gap: 3px;
+  padding: 5px 0 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.compact .cell:hover {
+  background: none;
+}
+
+.compact .number {
+  align-self: center;
+  min-width: 32px;
+  height: 32px;
+  font-size: var(--text-base);
+}
+
+.compact .picked .number:not(.today) {
+  background: var(--surface-3);
+  box-shadow: inset 0 0 0 1.5px var(--primary-strong);
+}
+
+.compact .picked .today {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--primary-strong);
+}
+
+.compact .outside {
+  opacity: 0.45;
+}
+
+.compact.holiday,
+.compact .holiday {
+  background-image: none;
+}
+
+.dots {
+  display: flex;
+  gap: 3px;
+  height: 6px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--event);
 }

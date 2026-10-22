@@ -78,3 +78,78 @@
     opacity: 1;
   }
 }
+
+/* Teléfono: agenda vertical, un día por fila con la fecha a la izquierda */
+@media (max-width: 640px) {
+  .columns {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-height: 0;
+    padding-top: 0;
+    border-top: none;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .column {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--space-3);
+    padding: var(--space-3) var(--space-2);
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+  }
+
+  .column > :not(.heading) {
+    grid-column: 2;
+  }
+
+  .heading {
+    grid-row: span 2;
+    margin: 0;
+    padding-top: 0;
+  }
+
+  .list {
+    margin-bottom: var(--space-1);
+  }
+
+  .today {
+    border-bottom-color: transparent;
+    border-radius: var(--radius-md);
+  }
+
+  .add {
+    justify-content: flex-start;
+    min-height: 36px;
+    padding-inline: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  /* Con eventos, para sumar otro está el "+" del menú; el atajo queda en los días libres */
+  .add:not(.addEmpty) {
+    display: none;
+  }
+
+  .addEmpty {
+    min-height: 44px;
+    border-color: var(--border);
+  }
+
+  /* Vista día: la fecha ya está arriba, la columna ocupa todo el ancho */
+  .columns[data-single] .column {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline: 0;
+    background: none;
+  }
+
+  .columns[data-single] .column > :not(.heading) {
+    grid-column: auto;
+  }
+
+  .columns[data-single] .heading {
+    display: none;
+  }
+}

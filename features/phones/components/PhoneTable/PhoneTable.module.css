@@ -87,8 +87,24 @@
   }
 }
 
-/* Mobile: cada fila es un bloque */
+.menu {
+  display: none;
+}
+
+.inlineActions {
+  display: inline-flex;
+  gap: 2px;
+}
+
+/*
+ * Teléfono: guía compacta. La oficina va como rótulo solo en la primera fila
+ * del grupo; abajo, quién atiende a la izquierda y el número grande a la derecha.
+ */
 @media (max-width: 640px) {
+  .wrapper {
+    border-top: none;
+  }
+
   .table thead {
     display: none;
   }
@@ -100,20 +116,22 @@
 
   .row {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     grid-template-areas:
-      "office actions"
-      "agent actions"
-      "phone actions";
-    padding: var(--space-3) 0;
+      "office office office"
+      "agent phone actions";
+    align-items: center;
+    column-gap: var(--space-1);
+    padding: var(--space-3) 0 var(--space-2);
   }
 
   .repeated {
+    padding-top: var(--space-2);
     background-size: 100% 1px;
   }
 
   .table td {
-    padding: 0 var(--space-2);
+    padding: 0;
   }
 
   .office,
@@ -124,28 +142,42 @@
 
   .office {
     grid-area: office;
-    font-size: var(--text-sm);
-    color: var(--text-muted);
+    margin-bottom: 2px;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
   }
 
-  .officeRepeated {
-    color: inherit;
-    user-select: auto;
+  .repeated .office {
+    display: none;
   }
 
   .agent {
     grid-area: agent;
+    min-width: 0;
     font-weight: 500;
+    overflow-wrap: anywhere;
   }
 
   .phone {
     grid-area: phone;
-    margin-top: var(--space-1);
+    font-size: var(--text-md);
   }
 
   .actions {
     grid-area: actions;
-    align-self: center;
+    width: auto;
     opacity: 1;
+  }
+
+  .inlineActions {
+    display: none;
+  }
+
+  .menu {
+    display: inline-flex;
   }
 }

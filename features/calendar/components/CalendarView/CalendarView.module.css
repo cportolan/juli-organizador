@@ -20,3 +20,16 @@
   opacity: 0.55;
   transition-delay: 120ms;
 }
+
+@media (max-width: 860px) {
+  .calendar {
+    --calendar-height: max(420px, calc(100dvh - 140px - var(--tabbar-height)));
+    --dock-space: 72px;
+  }
+}
+
+@media (max-width: 640px) {
+  .calendar {
+    gap: var(--space-3);
+  }
+}

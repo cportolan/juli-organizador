@@ -58,11 +58,22 @@
 
 @media (max-width: 860px) {
   .page {
-    gap: var(--space-5);
-    padding: var(--space-6) var(--space-4) var(--space-10);
+    gap: var(--space-4);
+    padding: calc(var(--space-5) + env(safe-area-inset-top)) var(--space-4) var(--space-8);
   }
 
   .title {
     font-size: var(--text-2xl);
+  }
+}
+
+/* En el teléfono la bajada de cada sección es ruido: el título alcanza */
+@media (max-width: 640px) {
+  .header {
+    align-items: center;
+  }
+
+  .description {
+    display: none;
   }
 }

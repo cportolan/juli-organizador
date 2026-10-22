@@ -32,7 +32,9 @@ export default function Modal({
     if (open && !dialog.open) {
       dialog.showModal();
       // showModal enfoca el primer botón (la X); en formularios es mejor arrancar en el primer campo.
-      dialog.querySelector(`.${styles.body} :is(input:not([type="hidden"]), textarea, select)`)?.focus();
+      // En pantallas táctiles no: el teclado taparía la hoja apenas se abre.
+      if (window.matchMedia("(pointer: coarse)").matches) dialog.querySelector(`.${styles.panel}`)?.focus();
+      else dialog.querySelector(`.${styles.body} :is(input:not([type="hidden"]), textarea, select)`)?.focus();
     }
     if (!open && dialog.open) dialog.close();
   }, [open]);
@@ -55,7 +57,7 @@ export default function Modal({
       onCancel={handleCancel}
       onClick={handleBackdropClick}
     >
-      <div className={styles.panel}>
+      <div className={styles.panel} tabIndex={-1}>
         {(title || onClose) && (
           <header className={styles.header}>
             <div className={styles.heading}>

@@ -93,7 +93,7 @@
   .fab {
     position: fixed;
     right: var(--space-4);
-    bottom: var(--space-4);
+    bottom: calc(var(--space-4) + var(--tabbar-height));
     z-index: 30;
     display: grid;
     place-items: center;
@@ -129,5 +129,47 @@
   .scrimVisible {
     opacity: 1;
     pointer-events: auto;
+  }
+}
+
+/* Teléfono: hoja que sube desde abajo, del alto de su contenido */
+@media (max-width: 640px) {
+  .fab {
+    border-radius: var(--radius-full);
+  }
+
+  .panel,
+  .closed {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    max-height: 86dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-left: none;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    transform: translateY(100%);
+  }
+
+  .sheetOpen {
+    transform: none;
+  }
+
+  /* Manija visual de la hoja */
+  .panel::before {
+    content: "";
+    align-self: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 4px;
+    margin-top: var(--space-2);
+    border-radius: var(--radius-full);
+    background: var(--border-strong);
+  }
+
+  .header {
+    min-height: 56px;
+    padding-block: var(--space-1);
   }
 }

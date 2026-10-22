@@ -23,27 +23,39 @@ const DAY_ITEMS = [
   { id: 3, label: "3 días" },
 ];
 
-/** Menú flotante abajo del calendario (estilo Figma): vista, modo, días y nuevo evento. */
-export default function CalendarDock({ state, layout, onView, onLayout, onDays, onNew }) {
+/**
+ * Menú flotante abajo del calendario (estilo Figma): vista, modo, días y nuevo evento.
+ * En el teléfono semana y día son siempre agenda, así que solo quedan la vista y el "+".
+ */
+export default function CalendarDock({ state, layout, phone = false, onView, onLayout, onDays, onNew }) {
+  const showLayout = state.view !== "mes" && !phone;
   return (
     <div className={styles.dock}>
       <div className={styles.bar} role="toolbar" aria-label="Vista del calendario">
         <SegmentedControl label="Vista" items={VIEW_ITEMS} value={state.view} onChange={onView} size="sm" />
-        {state.view !== "mes" && (
+        {showLayout && (
           <>
             <span className={styles.divider} aria-hidden />
             <SegmentedControl label="Mostrar" items={LAYOUT_ITEMS} value={layout} onChange={onLayout} size="sm" iconOnly />
           </>
         )}
-        {state.view === "semana" && (
+        {state.view === "semana" && !phone && (
           <>
             <span className={styles.divider} aria-hidden />
             <SegmentedControl label="Días visibles" items={DAY_ITEMS} value={state.days} onChange={onDays} size="sm" />
           </>
         )}
         <span className={styles.divider} aria-hidden />
-        <Button variant="primary" size="sm" icon={Plus} onClick={onNew} aria-keyshortcuts="n">
-          Evento
+        <Button
+          variant="primary"
+          size="sm"
+          icon={Plus}
+          onClick={onNew}
+          aria-keyshortcuts="n"
+          aria-label="Nuevo evento"
+          className={styles.newEvent}
+        >
+          <span className={styles.newLabel}>Evento</span>
         </Button>
       </div>
     </div>

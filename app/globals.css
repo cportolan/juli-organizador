@@ -112,6 +112,11 @@
   --right-sidebar-width: 320px;
   --content-max: 1680px;
 
+  /* Celular: barra de pestañas abajo. --tabbar-height incluye el área segura
+     del sistema (gestos / home indicator) y es 0 en escritorio. */
+  --tabbar-base: 64px;
+  --tabbar-height: 0px;
+
   color-scheme: light;
 }
 
@@ -154,6 +159,12 @@
   --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.65);
 
   color-scheme: dark;
+}
+
+@media (max-width: 860px) {
+  :root {
+    --tabbar-height: calc(var(--tabbar-base) + env(safe-area-inset-bottom));
+  }
 }
 
 /* Tipografías elegibles */
@@ -252,6 +263,15 @@ svg {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* Teléfono: los campos en 16px como mínimo, así iOS no hace zoom al enfocarlos */
+@media (max-width: 640px) {
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]),
+  select,
+  textarea {
+    font-size: max(16px, 1em) !important;
+  }
 }
 
 /* Scrollbars discretas */

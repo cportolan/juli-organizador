@@ -5,6 +5,7 @@ import { es } from "date-fns/locale";
 import { useToday } from "@/lib/hooks/useToday";
 import Skeleton from "@/components/ui/Skeleton/Skeleton";
 import styles from "./Sidebar.module.css";
+import { capitalize } from "@/lib/utils/format";
 
 /** La fecha de hoy, en grande: el ancla de todo el organizador. */
 export default function SidebarToday({ collapsed }) {
@@ -20,7 +21,6 @@ export default function SidebarToday({ collapsed }) {
   }
 
   const date = parseISO(today);
-  const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 
   if (collapsed) {
     return (

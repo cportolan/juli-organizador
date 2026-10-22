@@ -102,10 +102,19 @@
   }
 }
 
+/* Teléfono: la ficha va de borde a borde, sin marco de tarjeta */
 @media (max-width: 640px) {
   .sheet {
-    padding: var(--space-4);
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    min-height: 0;
+    margin-inline: calc(var(--space-4) * -1);
+    padding: var(--space-4) var(--space-4) var(--space-6);
+    border-inline: none;
+    border-bottom: none;
+    border-radius: 0;
+  }
+
+  .editor {
+    min-height: 280px;
   }
 
   .name {

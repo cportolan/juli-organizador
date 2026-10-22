@@ -5,7 +5,7 @@
  */
 .dock {
   position: sticky;
-  bottom: 0;
+  bottom: var(--tabbar-height);
   z-index: 20;
   height: 0;
   margin-top: calc(var(--space-4) * -1);
@@ -58,10 +58,34 @@
 }
 
 @media (max-width: 640px) {
+  /* Fijo sobre la barra de pestañas, aunque la vista sea corta */
+  .dock {
+    position: fixed;
+    right: var(--space-4);
+    bottom: var(--tabbar-height);
+    left: var(--space-4);
+    margin-top: 0;
+  }
+
   .bar {
+    bottom: var(--space-4);
     left: 0;
     translate: none;
-    max-width: calc(100% - 68px);
+    max-width: calc(100% - 64px);
+    padding: 5px;
+    border-radius: var(--radius-full);
+  }
+
+  /* "+" redondo: el texto queda para lectores de pantalla (aria-label) */
+  .newEvent {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: var(--radius-full);
+  }
+
+  .newLabel {
+    display: none;
   }
 }
 

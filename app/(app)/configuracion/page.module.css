@@ -1,5 +1,16 @@
-.privacy {
+.privacy,
+.session {
   margin-top: var(--space-6);
   padding-top: var(--space-8);
   border-top: 1px solid var(--border-strong);
+}
+
+.session {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .session {
+    display: block;
+  }
 }

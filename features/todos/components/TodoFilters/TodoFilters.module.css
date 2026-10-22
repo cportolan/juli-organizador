@@ -26,3 +26,23 @@
 .clear {
   animation: fade-in var(--dur) var(--ease-out);
 }
+
+/* Teléfono: los filtros en una sola fila que se desliza, de borde a borde */
+@media (max-width: 640px) {
+  .filters {
+    flex-wrap: nowrap;
+    margin-inline: calc(var(--space-4) * -1);
+    padding: 2px var(--space-4);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filters > * {
+    flex-shrink: 0;
+  }
+}

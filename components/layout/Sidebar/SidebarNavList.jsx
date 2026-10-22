@@ -11,7 +11,7 @@ export function isActivePath(pathname, href) {
 }
 
 /** Lista de links con un indicador que se desliza por debajo hasta el activo. */
-export default function SidebarNavList({ items, collapsed, onNavigate }) {
+export default function SidebarNavList({ items, collapsed }) {
   const ref = useRef(null);
   const pathname = usePathname();
   useSlidingIndicator(ref, `${pathname}-${collapsed}`);
@@ -25,7 +25,6 @@ export default function SidebarNavList({ items, collapsed, onNavigate }) {
           item={item}
           active={isActivePath(pathname, item.href)}
           collapsed={collapsed}
-          onNavigate={onNavigate}
         />
       ))}
     </ul>

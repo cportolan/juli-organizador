@@ -1,6 +1,7 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { cx } from "@/lib/utils/cx";
 import Highlight from "@/components/ui/Highlight/Highlight";
+import DropdownMenu from "@/components/ui/DropdownMenu/DropdownMenu";
 import IconButton from "@/components/ui/IconButton/IconButton";
 import CopyPhoneButton from "../CopyPhoneButton/CopyPhoneButton";
 import styles from "./PhoneTable.module.css";
@@ -50,8 +51,20 @@ export default function PhoneTable({ phones, terms, onEdit, onDelete }) {
                   )}
                 </td>
                 <td className={styles.actions}>
-                  <IconButton icon={Pencil} label="Editar" size="sm" onClick={() => onEdit(phone)} />
-                  <IconButton icon={Trash2} label="Borrar" size="sm" onClick={() => onDelete(phone)} />
+                  <span className={styles.inlineActions}>
+                    <IconButton icon={Pencil} label="Editar" size="sm" onClick={() => onEdit(phone)} />
+                    <IconButton icon={Trash2} label="Borrar" size="sm" onClick={() => onDelete(phone)} />
+                  </span>
+                  {/* En el teléfono no hay hover: las acciones van en un menú */}
+                  <DropdownMenu
+                    label={`Opciones de ${phone.agent || phone.office || phone.phone || "este interno"}`}
+                    className={styles.menu}
+                    items={[
+                      { id: "edit", label: "Editar", icon: Pencil, onSelect: () => onEdit(phone) },
+                      { separator: true },
+                      { id: "delete", label: "Borrar", icon: Trash2, tone: "danger", onSelect: () => onDelete(phone) },
+                    ]}
+                  />
                 </td>
               </tr>
             );

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Columns3, List, ListTodo, Plus, SearchX, Table2, Tags } from "lucide-react";
 import { useStoredState } from "@/lib/hooks/useStoredState";
+import { PHONE_QUERY, useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { useToast } from "@/components/ui/Toast/Toast";
 import Button from "@/components/ui/Button/Button";
 import ConfirmDialog from "@/components/ui/ConfirmDialog/ConfirmDialog";
@@ -37,7 +38,10 @@ export default function TodoBoard({ initialTodos, initialCategories }) {
   const [deleting, setDeleting] = useState(null);
   const [managingCategories, setManagingCategories] = useState(false);
 
-  const view = VIEWS.find((item) => item.id === viewId) ?? VIEWS[0];
+  // En el teléfono la tabla no entra: quedan columnas e ítems, y la tabla se ve como ítems.
+  const phone = useMediaQuery(PHONE_QUERY);
+  const views = phone ? VIEWS.filter((item) => item.id !== "table") : VIEWS;
+  const view = views.find((item) => item.id === viewId) ?? (viewId === "table" ? VIEWS[2] : views[0]);
   const total = todoList.todos.length;
 
   const countByCategory = useMemo(() => {
@@ -90,10 +94,10 @@ export default function TodoBoard({ initialTodos, initialCategories }) {
           value={filters.query}
           onChange={filters.setQuery}
           label="Buscar pendientes"
-          placeholder="Buscar en títulos, descripciones y categorías"
+          placeholder="Buscar pendientes"
           className={styles.search}
         />
-        <SegmentedControl label="Vista" items={VIEWS} value={view.id} onChange={setViewId} iconOnly />
+        <SegmentedControl label="Vista" items={views} value={view.id} onChange={setViewId} iconOnly />
         <Button icon={Tags} onClick={() => setManagingCategories(true)} className={styles.compactMobile} aria-label="Categorías">
           Categorías
         </Button>

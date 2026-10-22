@@ -95,3 +95,20 @@
     min-height: 0;
   }
 }
+
+/* Teléfono: menos marco alrededor, más lugar para los pendientes */
+@media (max-width: 640px) {
+  .columns {
+    gap: var(--space-3);
+  }
+
+  .column {
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-2) var(--space-2);
+    border-radius: var(--radius-md);
+  }
+
+  .header {
+    padding-inline: var(--space-2);
+  }
+}

@@ -38,7 +38,7 @@ export default function ThemeSettings() {
           />
         </SettingsSection>
 
-        <SettingsSection title="Modo" description="“Sistema” sigue la configuración de tu computadora.">
+        <SettingsSection title="Modo" description="“Sistema” sigue la configuración de tu dispositivo.">
           <SegmentedControl
             label="Modo de color"
             items={MODE_ITEMS}
