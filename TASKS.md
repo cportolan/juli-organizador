@@ -200,6 +200,8 @@ Cada sección: Codex hace api + actions; Claude hace la UI. Pueden ir en paralel
   - Opcional, si sale fácil: `getHolidays({ from, to })` en `features/calendar/api.js` → `[{ date, name, type }]` para que el front marque los feriados en el calendario.
   — 2026-10-19
 
+- [ ] (De Claude para Codex) **Latencia de las Server Actions:** cada mutación hace hoy 3 viajes en serie a Supabase: `proxy.js` llama a `auth.getUser()` (el matcher también agarra los POST de las actions), `getActionContext()` vuelve a llamar a `auth.getUser()` y después va la query. Además Next ejecuta las actions **de a una**, así que tildar varios pendientes seguidos suma la latencia de cada uno. En el front el tilde ya es instantáneo, pero la confirmación (y el "Deshacer") tarda. Pedido: evaluar `auth.getClaims()` (verifica el JWT localmente si el proyecto usa signing keys asimétricas) en `getActionContext` y/o en `proxy.js`, o no repetir la validación del proxy en los POST de actions. — 2026-10-21
+
 ---
 
 ## Registro de decisiones

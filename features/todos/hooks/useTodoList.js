@@ -50,7 +50,10 @@ export function useTodoList(initialTodos) {
     async (todo, status) => {
       if (todo.status === status) return { ok: true, data: todo };
       const previous = { status: todo.status, doneAt: todo.doneAt };
-      startTransition(() => patch(todo.id, { status, doneAt: status === "done" ? new Date().toISOString() : null }));
+      // Urgente, fuera de startTransition: Next despacha la Server Action en una
+      // transición que queda suspendida hasta que responde, y React agrupa las
+      // transiciones, así que el tilde no se vería hasta tener la respuesta.
+      patch(todo.id, { status, doneAt: status === "done" ? new Date().toISOString() : null });
       const result = await runStatus({ id: todo.id, status });
       startTransition(() => (result.ok ? upsert(result.data) : patch(todo.id, previous)));
       return result;
@@ -62,7 +65,7 @@ export function useTodoList(initialTodos) {
   const setCategory = useCallback(
     async (todo, categoryId) => {
       const previous = todo.categoryId ?? null;
-      startTransition(() => patch(todo.id, { categoryId }));
+      patch(todo.id, { categoryId });
       const result = await runMove({ id: todo.id, data: { categoryId } });
       startTransition(() => (result.ok ? upsert(result.data) : patch(todo.id, { categoryId: previous })));
       return result;
