@@ -2,6 +2,7 @@
 
 import { MOBILE_QUERY, useMediaQuery } from "@/lib/hooks/useMediaQuery";
 import { useStoredState } from "@/lib/hooks/useStoredState";
+import { useKeyboardFlag } from "@/lib/hooks/useKeyboardFlag";
 import Sidebar from "@/components/layout/Sidebar/Sidebar";
 import TabBar from "@/components/layout/TabBar/TabBar";
 import styles from "./AppShell.module.css";
@@ -11,6 +12,7 @@ export default function AppShell({ children }) {
   const isMobile = useMediaQuery(MOBILE_QUERY);
   const [collapsedPref, setCollapsedPref] = useStoredState("oj-sidebar-collapsed", false);
   const collapsed = collapsedPref && !isMobile;
+  useKeyboardFlag();
 
   return (
     <div className={styles.shell}>

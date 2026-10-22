@@ -165,6 +165,11 @@
   :root {
     --tabbar-height: calc(var(--tabbar-base) + env(safe-area-inset-bottom));
   }
+
+  /* Con el teclado abierto la barra de pestañas se esconde (ver useKeyboardFlag) */
+  :root[data-keyboard] {
+    --tabbar-height: 0px;
+  }
 }
 
 /* Tipografías elegibles */

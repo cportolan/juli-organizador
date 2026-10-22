@@ -134,3 +134,8 @@
     animation: none;
   }
 }
+
+/* Teclado abierto: lo que flota abajo se esconde para no tapar lo que se escribe */
+:global(html[data-keyboard]) .dock {
+  display: none;
+}

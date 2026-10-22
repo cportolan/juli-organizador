@@ -176,3 +176,8 @@
     padding-block: var(--space-1);
   }
 }
+
+/* Teclado abierto: lo que flota abajo se esconde para no tapar lo que se escribe */
+:global(html[data-keyboard]) .fab {
+  display: none;
+}
