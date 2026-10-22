@@ -114,6 +114,8 @@
     width: calc(var(--control) - 10px);
     height: calc(var(--control) - 10px);
     padding: 0;
+    /* Button envuelve el texto (oculto) en un span: sin gap, la cruz queda al centro */
+    gap: 0;
     border-radius: var(--radius-full);
   }
 
