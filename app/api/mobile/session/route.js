@@ -1,10 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
-import { acceptsOrigin, openTicket, PRIVATE_HEADERS, readBody, SIGNED_OUT_COOKIE } from '@/lib/server/mobile/protocol'
+import { acceptsNativeNavigation, openTicket, PRIVATE_HEADERS, readBody, SIGNED_OUT_COOKIE } from '@/lib/server/mobile/protocol'
 
 export async function POST(request) {
   const failure = () => NextResponse.redirect(new URL('/login?mobile=expired', request.url), { status: 303, headers: PRIVATE_HEADERS })
-  if (!acceptsOrigin(request)) return new Response(null, { status: 403, headers: PRIVATE_HEADERS })
+  if (!acceptsNativeNavigation(request)) return new Response(null, { status: 403, headers: PRIVATE_HEADERS })
   let ticket
   try { ticket = openTicket(new URLSearchParams(await readBody(request)).get('ticket'), process.env.PEOPLE_COOKIE_SECRET) }
   catch { return failure() }

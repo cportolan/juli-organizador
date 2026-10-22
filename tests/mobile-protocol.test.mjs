@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { sealTicket, openTicket, acceptsOrigin, readBody } from '../lib/server/mobile/protocol.js'
+import { sealTicket, openTicket, acceptsOrigin, acceptsNativeNavigation, readBody } from '../lib/server/mobile/protocol.js'
 const secret = 'test-only-secret'.repeat(4)
 const now = 100000
 const subject = { tokenHash: 'one-time-token', userId: 'verified-user' }
@@ -26,6 +26,16 @@ test('native requests and same-origin requests are accepted; cross-origin login 
   assert.equal(acceptsOrigin(new Request(url, { headers: { origin: 'https://juli-organizador.vercel.app' } })), true)
   assert.equal(acceptsOrigin(new Request(url, { headers: { origin: 'https://attacker.test' } })), false)
   assert.equal(acceptsOrigin(new Request(url, { headers: { origin: 'null' } })), false)
+})
+test('Android WebView null-origin navigation is accepted only from the native app', () => {
+  const url = 'https://juli-organizador.vercel.app/api/mobile/session'
+  const native = 'Mozilla/5.0 (Linux; Android 14; wv) Chrome/141.0 Mobile Safari/537.36 JuliNative/1.0'
+  const request = headers => new Request(url, { method: 'POST', headers })
+  assert.equal(acceptsNativeNavigation(request({ origin: 'null', 'user-agent': native, 'sec-fetch-site': 'none' })), true)
+  assert.equal(acceptsNativeNavigation(request({ origin: 'null', 'user-agent': native })), true)
+  assert.equal(acceptsNativeNavigation(request({ origin: 'null', 'user-agent': 'Mozilla/5.0 Chrome/141.0' })), false)
+  assert.equal(acceptsNativeNavigation(request({ origin: 'null', 'user-agent': native, 'sec-fetch-site': 'cross-site' })), false)
+  assert.equal(acceptsNativeNavigation(request({ origin: 'https://attacker.test', 'user-agent': native })), false)
 })
 test('request bodies are bounded even without a content-length header', async () => {
   const request = body => new Request('https://example.test', { method: 'POST', body })
